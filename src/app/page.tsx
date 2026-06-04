@@ -25,10 +25,12 @@ export default function LandingPage() {
             <p className="text-[#f5c842] text-sm font-semibold uppercase tracking-widest mb-2">
               El torneo comienza en
             </p>
-            <Countdown
-              targetDate={TOURNAMENT_KICKOFF.toISOString()}
-              className="text-white text-3xl md:text-4xl justify-center"
-            />
+            <div className="flex justify-center">
+              <Countdown
+                targetDate={TOURNAMENT_KICKOFF.toISOString()}
+                className="text-white text-3xl md:text-4xl"
+              />
+            </div>
           </div>
 
           {/* Registration deadline warning */}
