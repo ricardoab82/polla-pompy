@@ -181,9 +181,9 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
 
       {/* Lock countdown */}
       {!isLocked && (
-        <div className="card text-center">
+        <div className="card flex flex-col items-center text-center">
           <p className="text-sm text-gray-500 mb-1">Cierra en</p>
-          <Countdown targetDate={lockTime.toISOString()} className="text-xl font-bold justify-center" />
+          <Countdown targetDate={lockTime.toISOString()} className="text-xl font-bold" />
         </div>
       )}
 
@@ -197,7 +197,7 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
 
       {/* Pick form */}
       <div className="card">
-        <h2 className="font-display text-2xl text-[#0a4a2e] mb-4">Tu pick</h2>
+        <h2 className="font-display text-2xl text-[#0a4a2e] mb-4 text-center">Tu pick</h2>
 
         {isLocked ? (
           <div className="text-center py-4">
