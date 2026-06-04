@@ -8,8 +8,6 @@ import { COLOMBIA_TEAM_NAME } from '@/lib/config';
 import staticFixtures from '@/lib/fixtures-2026.json';
 
 const API_BASE   = 'https://v3.football.api-sports.io';
-const LEAGUE_ID  = 1;
-const SEASON     = 2026;
 const API_KEY    = process.env.API_FOOTBALL_KEY!;
 
 // ── API status → internal status mapping ───────────────────
