@@ -1,8 +1,8 @@
 {
   "crons": [
     { "path": "/api/cron/sync-fixtures", "schedule": "0 3 * * *" },
-    { "path": "/api/cron/poll-live",     "schedule": "*/5 * * * *" },
-    { "path": "/api/cron/lock-picks",    "schedule": "*/15 * * * *" },
-    { "path": "/api/cron/reminders",     "schedule": "0 * * * *" }
+    { "path": "/api/cron/poll-live",     "schedule": "0 4 * * *" },
+    { "path": "/api/cron/lock-picks",    "schedule": "0 5 * * *" },
+    { "path": "/api/cron/reminders",     "schedule": "0 6 * * *" }
   ]
 }
