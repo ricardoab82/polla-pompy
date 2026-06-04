@@ -30,7 +30,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link href="/" className="font-display text-4xl text-[#0a4a2e]">
-            Polla de Pompy
+            La Polla de Pompy
           </Link>
           <p className="text-gray-500 mt-1">Ingresa a tu cuenta</p>
         </div>

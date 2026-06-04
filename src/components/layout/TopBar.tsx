@@ -21,7 +21,7 @@ export default async function TopBar() {
     <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/dashboard" className="font-display text-2xl text-[#0a4a2e]">
-          Polla de Pompy
+          La Polla de Pompy
         </Link>
 
         {/* Desktop nav */}
