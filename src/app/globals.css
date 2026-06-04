@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary:    #0a4a2e;
+    --color-secondary:  #f5c842;
+    --color-accent:     #e8f5e9;
+    --color-background: #f9fafb;
+    --color-dark:       #111827;
+  }
+
+  html {
+    background-color: #f9fafb;
+    color: #111827;
+  }
+
+  body {
+    font-family: var(--font-dm-sans), sans-serif;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-bebas-neue), sans-serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer components {
+  .colombia-border {
+    position: relative;
+    border-radius: 0.75rem;
+    background: white;
+  }
+  .colombia-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #FCD116, #003893, #CE1126);
+    z-index: -1;
+  }
+
+  .btn-primary {
+    @apply bg-[#0a4a2e] text-[#f5c842] font-semibold px-6 py-3 rounded-lg
+           hover:bg-[#0d5c39] active:scale-95 transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-[#f5c842] text-[#0a4a2e] font-semibold px-6 py-3 rounded-lg
+           hover:bg-[#f0be2a] active:scale-95 transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply border border-[#0a4a2e] text-[#0a4a2e] font-semibold
+           px-6 py-3 rounded-lg hover:bg-[#e8f5e9] active:scale-95 transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-4;
+  }
+
+  .badge-auto {
+    @apply inline-flex items-center gap-1 bg-orange-100 text-orange-700
+           text-xs font-semibold px-2 py-0.5 rounded-full;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+
+  .score-input {
+    @apply w-16 h-16 text-center text-2xl font-bold border-2 border-gray-200
+           rounded-xl focus:border-[#0a4a2e] focus:outline-none transition-colors;
+    font-family: var(--font-bebas-neue), sans-serif;
+  }
+}
+
+.countdown-urgent {
+  color: #dc2626 !important;
+  animation: urgentPulse 1s ease-in-out infinite;
+}
+
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+
+.trend-up   { color: #16a34a; }
+.trend-down { color: #dc2626; }
+.trend-same { color: #6b7280; }
+
+.mobile-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}

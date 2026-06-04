@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <clipPath id="circle-clip">
+      <circle cx="100" cy="100" r="90"/>
+    </clipPath>
+    <radialGradient id="ball-shine" cx="38%" cy="32%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#f0f0f0" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#cccccc" stop-opacity="0.1"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Base white ball -->
+  <circle cx="100" cy="100" r="90" fill="#ffffff" stroke="#222" stroke-width="3"/>
+
+  <!-- === Maruni-style geometric panels (clipped to circle) === -->
+  <g clip-path="url(#circle-clip)">
+
+    <!-- RED panels — top star points -->
+    <polygon points="100,10 130,45 100,55 70,45" fill="#e63329"/>
+    <polygon points="100,10 70,45 40,28 55,10" fill="#e63329" opacity="0.85"/>
+    <polygon points="100,10 130,45 160,28 145,10" fill="#e63329" opacity="0.85"/>
+
+    <!-- BLUE panels — left/right mid -->
+    <polygon points="10,100 45,70 55,100 45,130" fill="#1a3a8f"/>
+    <polygon points="190,100 155,70 145,100 155,130" fill="#1a3a8f"/>
+
+    <!-- BLACK panels — angled facets -->
+    <polygon points="40,28 55,10 30,10 10,40" fill="#1a1a1a"/>
+    <polygon points="160,28 145,10 170,10 190,40" fill="#1a1a1a"/>
+    <polygon points="10,40 10,70 40,55 40,28" fill="#1a1a1a" opacity="0.85"/>
+    <polygon points="190,40 190,70 160,55 160,28" fill="#1a1a1a" opacity="0.85"/>
+
+    <!-- RED panels — bottom star points -->
+    <polygon points="100,190 130,155 100,145 70,155" fill="#e63329"/>
+    <polygon points="100,190 70,155 40,172 55,190" fill="#e63329" opacity="0.85"/>
+    <polygon points="100,190 130,155 160,172 145,190" fill="#e63329" opacity="0.85"/>
+
+    <!-- BLACK panels — bottom angled -->
+    <polygon points="40,172 55,190 30,190 10,160" fill="#1a1a1a"/>
+    <polygon points="160,172 145,190 170,190 190,160" fill="#1a1a1a"/>
+    <polygon points="10,160 10,130 40,145 40,172" fill="#1a1a1a" opacity="0.85"/>
+    <polygon points="190,160 190,130 160,145 160,172" fill="#1a1a1a" opacity="0.85"/>
+
+    <!-- CENTER white hexagonal region -->
+    <polygon points="100,55 130,70 140,100 130,130 100,145 70,130 60,100 70,70" fill="#f5f5f5"/>
+
+    <!-- Thin panel seam lines -->
+    <g stroke="#333" stroke-width="1.2" fill="none" opacity="0.6">
+      <line x1="100" y1="10" x2="70" y2="45"/>
+      <line x1="100" y1="10" x2="130" y2="45"/>
+      <line x1="10" y1="100" x2="45" y2="70"/>
+      <line x1="10" y1="100" x2="45" y2="130"/>
+      <line x1="190" y1="100" x2="155" y2="70"/>
+      <line x1="190" y1="100" x2="155" y2="130"/>
+      <line x1="100" y1="190" x2="70" y2="155"/>
+      <line x1="100" y1="190" x2="130" y2="155"/>
+      <line x1="70" y1="45" x2="60" y2="100"/>
+      <line x1="130" y1="45" x2="140" y2="100"/>
+      <line x1="45" y1="130" x2="70" y2="155"/>
+      <line x1="155" y1="130" x2="130" y2="155"/>
+    </g>
+  </g>
+
+  <!-- Shine overlay -->
+  <circle cx="100" cy="100" r="90" fill="url(#ball-shine)"/>
+
+  <!-- Outer border -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#222" stroke-width="3"/>
+</svg>
