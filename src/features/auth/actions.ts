@@ -67,15 +67,24 @@ export async function registerAction(formData: FormData) {
 
 export async function signInWithGoogleAction() {
   const supabase = createClient();
-  const headersList = headers();
-  const host = headersList.get('host') ?? 'localhost:3000';
-  const protocol = host.startsWith('localhost') ? 'http' : 'https';
-  const origin = `${protocol}://${host}`;
+
+  // NEXT_PUBLIC_APP_URL must be set in Vercel env vars:
+  //   https://polla-pompy.vercel.app
+  // Falls back to host header for local dev.
+  let origin = process.env.NEXT_PUBLIC_APP_URL;
+  if (!origin) {
+    const headersList = headers();
+    const host = headersList.get('host') ?? 'localhost:3000';
+    const protocol = host.startsWith('localhost') ? 'http' : 'https';
+    origin = `${protocol}://${host}`;
+  }
+
+  console.log('[signInWithGoogleAction] redirectTo origin:', origin);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${origin}/auth/callback?next=/dashboard`,
+      redirectTo: `${origin}/auth/callback`,
     },
   });
 
