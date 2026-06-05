@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/dashboard';
 
-  console.log('[auth/callback] code:', code ? 'present' : 'MISSING');
+  console.log('[auth/callback] full URL:', request.url);
+  console.log('[auth/callback] code param:', code);
   console.log('[auth/callback] next:', next);
   console.log('[auth/callback] origin:', origin);
 
