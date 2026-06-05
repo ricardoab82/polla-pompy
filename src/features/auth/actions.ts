@@ -5,6 +5,7 @@ import { LoginSchema, RegisterSchema } from '@/lib/schemas';
 import { REGISTRATION_DEADLINE } from '@/lib/config';
 import { sendWelcomeEmail } from '@/lib/notifications';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 
 export async function loginAction(formData: FormData) {
   const raw = {
@@ -66,12 +67,15 @@ export async function registerAction(formData: FormData) {
 
 export async function signInWithGoogleAction() {
   const supabase = createClient();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const headersList = headers();
+  const host = headersList.get('host') ?? 'localhost:3000';
+  const protocol = host.startsWith('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${appUrl}/auth/callback`,
+      redirectTo: `${origin}/auth/callback?next=/dashboard`,
     },
   });
 
