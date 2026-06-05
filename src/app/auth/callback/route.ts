@@ -33,8 +33,9 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    console.log('[auth/callback] exchangeCodeForSession error:', error?.message ?? 'none');
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    console.log('[auth/callback] exchangeCodeForSession error:', error);
+    console.log('[auth/callback] exchangeCodeForSession data:', data);
 
     if (!error) {
       console.log('[auth/callback] redirecting to:', `${origin}${next}`);
