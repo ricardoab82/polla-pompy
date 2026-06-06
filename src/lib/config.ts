@@ -31,19 +31,26 @@ export const MAX_BONUS_QUESTIONS_PER_MATCH = 5;
 // Colombia teams list (for highlighting)
 export const COLOMBIA_TEAM_NAME = 'Colombia';
 
-// All 48 World Cup 2026 teams (for special picks dropdowns)
+// Confirmed 48 qualified teams for FIFA World Cup 2026
 export const WC2026_TEAMS = [
-  'Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'Colombia',
-  'Costa Rica', 'Ecuador', 'Honduras', 'Jamaica', 'Mexico', 'Panama',
-  'Paraguay', 'Peru', 'United States', 'Uruguay', 'Venezuela',
-  'Algeria', 'Cameroon', 'Côte d\'Ivoire', 'Egypt', 'Ghana', 'Mali',
-  'Morocco', 'Nigeria', 'Senegal', 'South Africa', 'Tunisia',
-  'China', 'Indonesia', 'Iran', 'Japan', 'New Zealand', 'Saudi Arabia',
-  'South Korea', 'Uzbekistan',
-  'Albania', 'Austria', 'Belgium', 'Croatia', 'Czech Republic',
-  'England', 'France', 'Germany', 'Hungary', 'Italy', 'Netherlands',
-  'Poland', 'Portugal', 'Romania', 'Serbia', 'Slovakia', 'Spain',
-  'Switzerland', 'Turkey', 'Ukraine',
+  // CONCACAF (6)
+  'United States', 'Mexico', 'Canada', 'Panama', 'Costa Rica', 'Honduras',
+  // CONMEBOL (6)
+  'Argentina', 'Brazil', 'Colombia', 'Uruguay', 'Ecuador', 'Venezuela',
+  // UEFA (16)
+  'Germany', 'Spain', 'France', 'England', 'Portugal', 'Netherlands',
+  'Belgium', 'Italy', 'Croatia', 'Austria', 'Switzerland', 'Serbia',
+  'Hungary', 'Slovakia', 'Denmark', 'Turkey',
+  // CAF (9)
+  'Morocco', 'Senegal', 'Egypt', 'Nigeria', 'South Africa',
+  'Algeria', 'Cameroon', 'Tunisia', 'Mali',
+  // AFC (8)
+  'Japan', 'South Korea', 'Iran', 'Saudi Arabia',
+  'Australia', 'Indonesia', 'China', 'Uzbekistan',
+  // OFC (1)
+  'New Zealand',
+  // Playoff spots (2)
+  'Playoff 1 (TBD)', 'Playoff 2 (TBD)',
 ] as const;
 
 export type WC2026Team = (typeof WC2026_TEAMS)[number];

@@ -245,6 +245,106 @@ export async function gradeSpecialPicksAction(formData: FormData) {
   return { success: true, updated };
 }
 
+// ── Bonus week management ───────────────────────────────────
+
+export async function closeBonusWeekAction(formData: FormData) {
+  const { error, supabase } = await requireAdmin();
+  if (error || !supabase) return { error };
+
+  const weekNumber = Number(formData.get('week_number'));
+  const weekStart  = formData.get('week_start') as string;
+  const weekEnd    = formData.get('week_end') as string;
+
+  if (!weekNumber || !weekStart || !weekEnd) {
+    return { error: 'Faltan datos de la semana' };
+  }
+
+  // Check not already closed
+  const { data: existing } = await supabase
+    .from('bonus_weekly_standings')
+    .select('id')
+    .eq('week_number', weekNumber)
+    .eq('finalized', true)
+    .limit(1);
+
+  if (existing?.length) return { error: 'Esta semana ya fue cerrada.' };
+
+  // Get all active users
+  const { data: users } = await supabase
+    .from('users')
+    .select('id')
+    .eq('is_active', true);
+
+  if (!users?.length) return { error: 'No hay usuarios activos' };
+
+  // Sum bonus points per user from open (week_number IS NULL) bonus_answers
+  const { data: answerTotals } = await supabase
+    .from('bonus_answers')
+    .select('user_id, points_earned')
+    .is('week_number', null);
+
+  const ptsByUser = new Map<string, number>();
+  for (const a of answerTotals ?? []) {
+    if (a.points_earned) {
+      ptsByUser.set(a.user_id, (ptsByUser.get(a.user_id) ?? 0) + a.points_earned);
+    }
+  }
+
+  // Build ranked standings
+  const ranked = users
+    .map((u) => ({ user_id: u.id, pts: ptsByUser.get(u.id) ?? 0 }))
+    .sort((a, b) => b.pts - a.pts);
+
+  let rank = 1;
+  const rows = ranked.map((r, i) => {
+    if (i > 0 && r.pts < ranked[i - 1].pts) rank = i + 1;
+    return {
+      week_number:            weekNumber,
+      week_start:             weekStart,
+      week_end:               weekEnd,
+      user_id:                r.user_id,
+      bonus_points_this_week: r.pts,
+      rank,
+      finalized:              true,
+    };
+  });
+
+  const { error: insertErr } = await supabase
+    .from('bonus_weekly_standings')
+    .upsert(rows, { onConflict: 'week_number,user_id' });
+
+  if (insertErr) return { error: insertErr.message };
+
+  // Mark all open bonus_answers with this week_number
+  await supabase
+    .from('bonus_answers')
+    .update({ week_number: weekNumber })
+    .is('week_number', null);
+
+  revalidatePath('/admin/bonus-weeks');
+  revalidatePath('/bonus-standings');
+  return { success: true, snapshotted: rows.length };
+}
+
+export async function assignSponsorPrizeAction(formData: FormData) {
+  const { error, supabase } = await requireAdmin();
+  if (error || !supabase) return { error };
+
+  const weekNumber   = Number(formData.get('week_number'));
+  const sponsorPrize = (formData.get('sponsor_prize') as string).trim();
+
+  const { error: updateErr } = await supabase
+    .from('bonus_weekly_standings')
+    .update({ sponsor_prize: sponsorPrize })
+    .eq('week_number', weekNumber);
+
+  if (updateErr) return { error: updateErr.message };
+
+  revalidatePath('/admin/bonus-weeks');
+  revalidatePath('/bonus-standings');
+  return { success: true };
+}
+
 // ── Full recalculation ──────────────────────────────────────
 
 export async function recalculateAllPointsAction() {

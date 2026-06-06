@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Inicio',  icon: '🏠' },
-  { href: '/picks',     label: 'Picks',   icon: '⚽' },
-  { href: '/standings', label: 'Tabla',   icon: '📊' },
-  { href: '/profile',   label: 'Perfil',  icon: '👤' },
+  { href: '/dashboard',       label: 'Inicio',     icon: '🏠' },
+  { href: '/picks',           label: 'Picks',      icon: '⚽' },
+  { href: '/standings',       label: 'Posiciones', icon: '📊' },
+  { href: '/bonus-standings', label: 'Bonus',      icon: '🎯' },
+  { href: '/profile',         label: 'Perfil',     icon: '👤' },
 ];
 
 export default function MobileNav() {

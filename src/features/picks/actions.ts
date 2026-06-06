@@ -5,6 +5,69 @@ import { PickSchema, BonusAnswerSchema } from '@/lib/schemas';
 import { PICK_LOCK_MINUTES } from '@/lib/config';
 import { revalidatePath } from 'next/cache';
 
+export interface BulkPickInput {
+  match_id:  string;
+  home_pick: number;
+  away_pick: number;
+}
+
+export async function submitBulkPicksAction(picks: BulkPickInput[]): Promise<{
+  saved: number;
+  errors: Record<string, string>;
+}> {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { saved: 0, errors: { _auth: 'No autenticado' } };
+
+  const matchIds = picks.map((p) => p.match_id);
+  const { data: matches } = await supabase
+    .from('matches')
+    .select('id, kickoff_utc')
+    .in('id', matchIds);
+
+  const now = Date.now();
+  const lockMap = new Map(
+    (matches ?? []).map((m) => [
+      m.id,
+      new Date(m.kickoff_utc).getTime() - PICK_LOCK_MINUTES * 60 * 1000,
+    ])
+  );
+
+  let saved = 0;
+  const errors: Record<string, string> = {};
+
+  for (const pick of picks) {
+    const lockTime = lockMap.get(pick.match_id);
+    if (!lockTime || now >= lockTime) {
+      errors[pick.match_id] = 'Cerrado';
+      continue;
+    }
+
+    const { error } = await supabase
+      .from('picks')
+      .upsert(
+        {
+          user_id:          user.id,
+          match_id:         pick.match_id,
+          home_pick:        pick.home_pick,
+          away_pick:        pick.away_pick,
+          is_auto_assigned: false,
+          submitted_at:     new Date().toISOString(),
+        },
+        { onConflict: 'user_id,match_id' }
+      );
+
+    if (error) {
+      errors[pick.match_id] = error.message;
+    } else {
+      saved++;
+    }
+  }
+
+  revalidatePath('/picks');
+  return { saved, errors };
+}
+
 export async function submitPickAction(formData: FormData) {
   const raw = {
     match_id:  formData.get('match_id') as string,

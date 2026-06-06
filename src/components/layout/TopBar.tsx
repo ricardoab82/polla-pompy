@@ -27,8 +27,9 @@ export default async function TopBar() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
           <Link href="/dashboard" className="hover:text-[#0a4a2e] transition-colors">Inicio</Link>
-          <Link href="/picks"     className="hover:text-[#0a4a2e] transition-colors">Picks</Link>
-          <Link href="/standings" className="hover:text-[#0a4a2e] transition-colors">Tabla</Link>
+          <Link href="/picks"           className="hover:text-[#0a4a2e] transition-colors">Picks</Link>
+          <Link href="/standings"       className="hover:text-[#0a4a2e] transition-colors">Posiciones</Link>
+          <Link href="/bonus-standings" className="hover:text-[#0a4a2e] transition-colors">Bonus</Link>
           {profile?.role !== 'participant' && (
             <Link href="/admin" className="hover:text-[#0a4a2e] transition-colors text-amber-600">
               Admin
