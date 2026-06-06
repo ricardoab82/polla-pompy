@@ -5,7 +5,6 @@ import { LoginSchema, RegisterSchema } from '@/lib/schemas';
 import { REGISTRATION_DEADLINE } from '@/lib/config';
 import { sendWelcomeEmail } from '@/lib/notifications';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 
 export async function loginAction(formData: FormData) {
   const raw = {
@@ -63,38 +62,6 @@ export async function registerAction(formData: FormData) {
 
   await sendWelcomeEmail(parsed.data.email, parsed.data.display_name);
   redirect('/onboarding');
-}
-
-export async function signInWithGoogleAction() {
-  const supabase = createClient();
-
-  // NEXT_PUBLIC_APP_URL must be set in Vercel env vars:
-  //   https://polla-pompy.vercel.app
-  // Falls back to host header for local dev.
-  let origin = process.env.NEXT_PUBLIC_APP_URL;
-  if (!origin) {
-    const headersList = headers();
-    const host = headersList.get('host') ?? 'localhost:3000';
-    const protocol = host.startsWith('localhost') ? 'http' : 'https';
-    origin = `${protocol}://${host}`;
-  }
-
-  console.log('[signInWithGoogleAction] redirectTo origin:', origin);
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${origin}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  if (data.url) {
-    redirect(data.url);
-  }
 }
 
 export async function logoutAction() {
