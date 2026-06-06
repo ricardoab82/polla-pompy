@@ -236,7 +236,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                               type="number" min="0" max="20" inputMode="numeric"
                               value={inp.home}
                               onChange={(e) => setInput(match.id, 'home', e.target.value)}
-                              className="score-input w-12 text-center"
+                              className="score-input"
                               placeholder="0"
                             />
                             <span className="font-display text-xl text-gray-300">–</span>
@@ -244,7 +244,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                               type="number" min="0" max="20" inputMode="numeric"
                               value={inp.away}
                               onChange={(e) => setInput(match.id, 'away', e.target.value)}
-                              className="score-input w-12 text-center"
+                              className="score-input"
                               placeholder="0"
                             />
                           </div>

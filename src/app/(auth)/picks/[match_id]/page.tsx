@@ -103,6 +103,7 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
 
   const lockTime   = new Date(new Date(match.kickoff_utc).getTime() - PICK_LOCK_MINUTES * 60 * 1000);
   const isLocked   = new Date() >= lockTime;
+  const isLive     = match.status === 'live';
   const isFinished = match.status === 'finished';
 
   function handlePickSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -155,24 +156,39 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
         <div className="flex items-center gap-4 justify-between">
           <div className="flex flex-col items-center gap-1 flex-1">
             {match.home_team_logo && (
-              <Image src={match.home_team_logo} alt={match.home_team} width={48} height={48} className="object-contain" />
+              <Image src={match.home_team_logo} alt={match.home_team} width={56} height={56} className="object-contain" />
             )}
             <p className="font-semibold text-center text-sm">{match.home_team}</p>
           </div>
 
           <div className="text-center flex-none">
             {isFinished && match.home_score !== null ? (
-              <div className="font-display text-4xl text-[#0a4a2e]">
+              <div className="font-display text-5xl text-[#0a4a2e]">
                 {match.home_score} – {match.away_score}
               </div>
+            ) : isLive ? (
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-sm font-bold text-green-600">EN VIVO</span>
+                </div>
+                {match.home_score !== null && (
+                  <div className="font-display text-5xl text-[#0a4a2e]">
+                    {match.home_score} – {match.away_score}
+                  </div>
+                )}
+              </div>
             ) : (
-              <p className="text-sm text-gray-500">{formatKickoff(match.kickoff_utc)}</p>
+              <div className="flex flex-col items-center gap-1">
+                <span className="font-display text-5xl text-gray-300">vs</span>
+                <p className="text-xs text-gray-400">{formatKickoff(match.kickoff_utc)}</p>
+              </div>
             )}
           </div>
 
           <div className="flex flex-col items-center gap-1 flex-1">
             {match.away_team_logo && (
-              <Image src={match.away_team_logo} alt={match.away_team} width={48} height={48} className="object-contain" />
+              <Image src={match.away_team_logo} alt={match.away_team} width={56} height={56} className="object-contain" />
             )}
             <p className="font-semibold text-center text-sm">{match.away_team}</p>
           </div>

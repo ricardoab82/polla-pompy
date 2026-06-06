@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import Countdown from '@/components/ui/Countdown';
 import { TOURNAMENT_KICKOFF, REGISTRATION_DEADLINE } from '@/lib/config';
 
@@ -13,6 +14,14 @@ export default function LandingPage() {
       {/* Hero */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
         <div className="max-w-2xl mx-auto">
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/loading-images/ball.svg"
+              alt="La Polla de Pompy"
+              width={72}
+              height={72}
+            />
+          </div>
           <h1 className="font-display text-6xl md:text-8xl text-[#f5c842] leading-none mb-2">
             La Polla de Pompy
           </h1>
