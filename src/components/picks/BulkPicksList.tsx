@@ -113,7 +113,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
     });
   }
 
-  const dirtyCount = [...dirty].filter((id) => {
+  const dirtyCount = Array.from(dirty).filter((id) => {
     const inp = inputs[id];
     return inp && inp.home !== '' && inp.away !== '';
   }).length;
