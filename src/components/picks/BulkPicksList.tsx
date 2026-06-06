@@ -89,7 +89,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
 
   function saveAll() {
     const toSave: BulkPickInput[] = [];
-    for (const matchId of dirty) {
+    for (const matchId of Array.from(dirty)) {
       const inp = inputs[matchId];
       if (!inp || inp.home === '' || inp.away === '') continue;
       toSave.push({ match_id: matchId, home_pick: Number(inp.home), away_pick: Number(inp.away) });
