@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Avatar from '@/components/ui/Avatar';
 import { logoutAction } from '@/features/auth/actions';
+import { REGISTRATION_DEADLINE } from '@/lib/config';
+import EditSpecialPicksForm from '@/features/special-picks/EditSpecialPicksForm';
 
 export default async function ProfilePage() {
   const supabase = createClient();
@@ -27,6 +29,8 @@ export default async function ProfilePage() {
     .maybeSingle();
 
   if (!profile) redirect('/login');
+
+  const deadlinePassed = new Date() > REGISTRATION_DEADLINE;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
@@ -74,7 +78,14 @@ export default async function ProfilePage() {
       {/* Special picks */}
       {specialPicks && (
         <div className="card">
-          <h2 className="font-display text-2xl text-[#0a4a2e] mb-4">Picks especiales</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-2xl text-[#0a4a2e]">Picks especiales</h2>
+            {deadlinePassed && (
+              <span className="text-xs font-semibold bg-gray-100 text-gray-500 rounded-full px-3 py-1">
+                Plazo cerrado
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
             {[
               { label: '🏆 Campeón',     value: specialPicks.champion,    pts: specialPicks.champion_pts    ?? null, max: 20 },
@@ -93,6 +104,16 @@ export default async function ProfilePage() {
               </div>
             ))}
           </div>
+          {!deadlinePassed && (
+            <EditSpecialPicksForm
+              initialPicks={{
+                champion:    specialPicks.champion,
+                runner_up:   specialPicks.runner_up,
+                top_scorer:  specialPicks.top_scorer,
+                golden_ball: specialPicks.golden_ball,
+              }}
+            />
+          )}
         </div>
       )}
 
