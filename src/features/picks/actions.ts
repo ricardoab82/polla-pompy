@@ -65,6 +65,7 @@ export async function submitBulkPicksAction(picks: BulkPickInput[]): Promise<{
   }
 
   revalidatePath('/picks');
+  revalidatePath('/bracket');
   return { saved, errors };
 }
 
