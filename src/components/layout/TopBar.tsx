@@ -20,15 +20,18 @@ export default async function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/dashboard" className="flex items-center">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <Image
             src="/loading-images/Logo.jpeg"
             alt="Pompy's Bet"
-            width={48}
-            height={48}
+            width={64}
+            height={64}
             className="rounded-lg"
           />
+          <span className="font-display text-xl text-[#f5c842] leading-none">
+            LA POLLA DE POMPY
+          </span>
         </Link>
 
         {/* Desktop nav */}
