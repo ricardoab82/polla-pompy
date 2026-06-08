@@ -16,10 +16,12 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto">
           <div className="flex justify-center mb-4">
             <Image
-              src="/loading-images/ball.svg"
-              alt="La Polla de Pompy"
-              width={72}
-              height={72}
+              src="/loading-images/Logo.jpeg"
+              alt="Pompy's Bet"
+              width={120}
+              height={120}
+              className="rounded-2xl"
+              priority
             />
           </div>
           <h1 className="font-display text-6xl md:text-8xl text-[#f5c842] leading-none mb-2">

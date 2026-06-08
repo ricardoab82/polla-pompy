@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import Avatar from '@/components/ui/Avatar';
 import { logoutAction } from '@/features/auth/actions';
@@ -20,8 +21,14 @@ export default async function TopBar() {
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/dashboard" className="font-display text-2xl text-[#0a4a2e]">
-          La Polla de Pompy
+        <Link href="/dashboard" className="flex items-center">
+          <Image
+            src="/loading-images/Logo.jpeg"
+            alt="Pompy's Bet"
+            width={32}
+            height={32}
+            className="rounded-lg"
+          />
         </Link>
 
         {/* Desktop nav */}
