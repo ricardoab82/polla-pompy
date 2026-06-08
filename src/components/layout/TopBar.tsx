@@ -25,8 +25,8 @@ export default async function TopBar() {
           <Image
             src="/loading-images/Logo.jpeg"
             alt="Pompy's Bet"
-            width={32}
-            height={32}
+            width={48}
+            height={48}
             className="rounded-lg"
           />
         </Link>
