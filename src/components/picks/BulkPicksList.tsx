@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { submitBulkPicksAction, type BulkPickInput } from '@/features/picks/actions';
+import { submitBulkPicksAction } from '@/features/picks/actions';
 import { PICK_LOCK_MINUTES } from '@/lib/config';
 
 interface Match {
@@ -60,73 +60,62 @@ function formatKickoff(utc: string) {
   });
 }
 
-export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
-  const pickMap = new Map(picks.map((p) => [p.match_id, p]));
-  const bonusMap = new Map(bonusCounts.map((b) => [b.match_id, b.count]));
+type SaveStatus = 'saving' | 'saved' | 'error';
 
-  const [inputs, setInputs] = useState<Record<string, { home: string; away: string }>>(() => {
+export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
+  const pickMap   = new Map(picks.map((p) => [p.match_id, p]));
+  const bonusMap  = new Map(bonusCounts.map((b) => [b.match_id, b.count]));
+
+  const initInputs = () => {
     const init: Record<string, { home: string; away: string }> = {};
     for (const p of picks) {
       init[p.match_id] = { home: String(p.home_pick), away: String(p.away_pick) };
     }
     return init;
-  });
+  };
 
-  const [dirty, setDirty]     = useState<Set<string>>(new Set());
-  const [saved, setSaved]     = useState<Set<string>>(new Set());
-  const [errors, setErrors]   = useState<Record<string, string>>({});
-  const [pending, startTransition] = useTransition();
+  const [inputs,    setInputs]    = useState<Record<string, { home: string; away: string }>>(initInputs);
+  const [lastSaved, setLastSaved] = useState<Record<string, { home: string; away: string }>>(initInputs);
+  const [statuses,  setStatuses]  = useState<Record<string, SaveStatus>>({});
+  const [errors,    setErrors]    = useState<Record<string, string>>({});
+  const [, startTransition] = useTransition();
 
   function setInput(matchId: string, field: 'home' | 'away', value: string) {
     setInputs((prev) => ({
       ...prev,
       [matchId]: { ...(prev[matchId] ?? { home: '', away: '' }), [field]: value },
     }));
-    setDirty((prev) => new Set(prev).add(matchId));
-    setSaved((prev) => { const s = new Set(prev); s.delete(matchId); return s; });
-    setErrors((prev) => { const e = { ...prev }; delete e[matchId]; return e; });
+    // Clear status while editing so the indicator disappears until blur
+    setStatuses((prev) => { const n = { ...prev }; delete n[matchId]; return n; });
+    setErrors((prev)   => { const n = { ...prev }; delete n[matchId]; return n; });
   }
 
-  function saveAll() {
-    const toSave: BulkPickInput[] = [];
-    for (const matchId of Array.from(dirty)) {
-      const inp = inputs[matchId];
-      if (!inp || inp.home === '' || inp.away === '') continue;
-      toSave.push({ match_id: matchId, home_pick: Number(inp.home), away_pick: Number(inp.away) });
-    }
-    if (!toSave.length) return;
+  function handleBlur(matchId: string, home: string, away: string) {
+    if (home === '' || away === '') return;
+
+    // Skip if identical to last successful save
+    const last = lastSaved[matchId];
+    if (last && last.home === home && last.away === away) return;
+
+    // Skip if a save is already in flight
+    if (statuses[matchId] === 'saving') return;
+
+    setStatuses((prev) => ({ ...prev, [matchId]: 'saving' }));
 
     startTransition(async () => {
-      const result = await submitBulkPicksAction(toSave);
-      const newSaved = new Set(saved);
-      const newErrors = { ...errors };
-      for (const pick of toSave) {
-        if (result.errors[pick.match_id]) {
-          newErrors[pick.match_id] = result.errors[pick.match_id];
-        } else {
-          newSaved.add(pick.match_id);
-        }
+      const result = await submitBulkPicksAction([
+        { match_id: matchId, home_pick: Number(home), away_pick: Number(away) },
+      ]);
+
+      if (result.errors[matchId]) {
+        setStatuses((prev) => ({ ...prev, [matchId]: 'error' }));
+        setErrors((prev)   => ({ ...prev, [matchId]: result.errors[matchId] }));
+      } else {
+        setStatuses((prev)   => ({ ...prev, [matchId]: 'saved' }));
+        setLastSaved((prev)  => ({ ...prev, [matchId]: { home, away } }));
       }
-      setSaved(newSaved);
-      setErrors(newErrors);
-      setDirty(new Set());
     });
   }
-
-  const dirtyCount = Array.from(dirty).filter((id) => {
-    const inp = inputs[id];
-    return inp && inp.home !== '' && inp.away !== '';
-  }).length;
-
-  const SaveButton = () => (
-    <button
-      onClick={saveAll}
-      disabled={pending || dirtyCount === 0}
-      className="btn-primary rounded-xl px-6 py-3 disabled:opacity-50"
-    >
-      {pending ? 'Guardando...' : `Guardar todos${dirtyCount > 0 ? ` (${dirtyCount})` : ''}`}
-    </button>
-  );
 
   const byPhase = new Map<string, Match[]>();
   for (const m of matches) {
@@ -145,10 +134,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="font-display text-4xl text-[#0a4a2e]">Mis Picks</h1>
-        <SaveButton />
-      </div>
+      <h1 className="font-display text-4xl text-[#0a4a2e]">Mis Picks</h1>
 
       {PHASE_ORDER.map((phase) => {
         const phaseMatches = byPhase.get(phase);
@@ -159,17 +145,15 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
             <h2 className="font-display text-2xl text-gray-700 mb-3">{PHASE_LABELS[phase]}</h2>
             <div className="space-y-2">
               {phaseMatches.map((match) => {
-                const lockTime  = new Date(new Date(match.kickoff_utc).getTime() - PICK_LOCK_MINUTES * 60 * 1000);
-                const isLocked  = new Date() >= lockTime;
-                const isLive    = match.status === 'live';
-                const isFinished = match.status === 'finished';
+                const lockTime     = new Date(new Date(match.kickoff_utc).getTime() - PICK_LOCK_MINUTES * 60 * 1000);
+                const isLocked     = new Date() >= lockTime;
+                const isLive       = match.status === 'live';
+                const isFinished   = match.status === 'finished';
                 const existingPick = pickMap.get(match.id);
-                const inp       = inputs[match.id] ?? { home: '', away: '' };
-                const isSaved   = saved.has(match.id);
-                const pickError = errors[match.id];
-                const isDirty   = dirty.has(match.id);
-                const bonusCount = bonusMap.get(match.id) ?? 0;
-                const pointsColor =
+                const inp          = inputs[match.id] ?? { home: '', away: '' };
+                const status       = statuses[match.id];
+                const bonusCount   = bonusMap.get(match.id) ?? 0;
+                const pointsColor  =
                   existingPick?.points_earned == null ? '' :
                   existingPick.points_earned > 0 ? 'text-green-600' : 'text-red-500';
 
@@ -177,9 +161,9 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                   <div
                     key={match.id}
                     className={`card py-3 px-4 ${match.is_colombia_match ? 'colombia-border' : ''}
-                                ${isLive ? 'ring-2 ring-green-400' : ''}
-                                ${isSaved ? 'ring-1 ring-green-300' : ''}
-                                ${pickError ? 'ring-1 ring-red-300' : ''}`}
+                                ${isLive            ? 'ring-2 ring-green-400' : ''}
+                                ${status === 'saved' ? 'ring-1 ring-green-300' : ''}
+                                ${status === 'error' ? 'ring-1 ring-red-300'   : ''}`}
                   >
                     <div className="flex items-center gap-2">
                       {/* Home team */}
@@ -192,7 +176,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                         </span>
                       </div>
 
-                      {/* Pick inputs / result */}
+                      {/* Centre */}
                       <div className="flex-1 flex flex-col items-center gap-1">
                         <p className="text-xs text-gray-400">{formatKickoff(match.kickoff_utc)}</p>
 
@@ -236,6 +220,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                               type="number" min="0" max="20" inputMode="numeric"
                               value={inp.home}
                               onChange={(e) => setInput(match.id, 'home', e.target.value)}
+                              onBlur={() => handleBlur(match.id, inp.home, inp.away)}
                               className="score-input"
                               placeholder="0"
                             />
@@ -244,17 +229,22 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                               type="number" min="0" max="20" inputMode="numeric"
                               value={inp.away}
                               onChange={(e) => setInput(match.id, 'away', e.target.value)}
+                              onBlur={() => handleBlur(match.id, inp.home, inp.away)}
                               className="score-input"
                               placeholder="0"
                             />
                           </div>
                         )}
 
-                        {/* Status indicators */}
-                        {isSaved && <span className="text-xs text-green-600 font-medium">✓ Guardado</span>}
-                        {pickError && <span className="text-xs text-red-500">{pickError}</span>}
-                        {isDirty && !isSaved && !pickError && (
-                          <span className="text-xs text-amber-500">Sin guardar</span>
+                        {/* Inline save status */}
+                        {status === 'saving' && (
+                          <span className="text-xs text-gray-400">Guardando...</span>
+                        )}
+                        {status === 'saved' && (
+                          <span className="text-xs text-green-600 font-medium">✓ Guardado</span>
+                        )}
+                        {status === 'error' && (
+                          <span className="text-xs text-red-500">✗ {errors[match.id] ?? 'Error'}</span>
                         )}
                       </div>
 
@@ -286,10 +276,6 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
           </section>
         );
       })}
-
-      <div className="flex justify-center pt-2">
-        <SaveButton />
-      </div>
     </div>
   );
 }

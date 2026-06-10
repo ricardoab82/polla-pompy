@@ -25,6 +25,8 @@ const ROUNDS = [
   { phase: 'final' as const,        label: 'Final',       short: 'FIN' },
 ];
 
+type SaveStatus = 'saving' | 'saved' | 'error';
+
 function formatDate(kickoff: string): string {
   return new Date(kickoff).toLocaleDateString('es-CO', {
     month: 'short',
@@ -53,15 +55,16 @@ interface TeamRowProps {
   showInput: boolean;
   showPickReadOnly: string | undefined;
   onInput: (v: string) => void;
+  onBlur: () => void;
   mobile: boolean;
 }
 
 function TeamRow({
   logo, name, isWinner, isLoser,
   score, inputValue, showInput, showPickReadOnly,
-  onInput, mobile,
+  onInput, onBlur, mobile,
 }: TeamRowProps) {
-  const h = mobile ? 'h-10' : 'h-7';
+  const h       = mobile ? 'h-10' : 'h-7';
   const imgSize = mobile ? 20 : 16;
   const nameCls = mobile ? 'text-sm' : 'text-xs';
   const scoreCls = mobile ? 'text-base w-6' : 'text-sm w-5';
@@ -113,6 +116,7 @@ function TeamRow({
           type="number" min="0" max="99"
           value={inputValue}
           onChange={e => onInput(e.target.value)}
+          onBlur={onBlur}
           className={`text-center border border-gray-300 rounded font-mono focus:outline-none focus:border-[#0a4a2e]
             ${mobile ? 'w-12 h-8 text-sm' : 'w-8 h-5 text-xs'}
           `}
@@ -131,38 +135,33 @@ interface MatchCardProps {
   bracketPicksOpen: boolean;
   inputs: { home: string; away: string };
   onInputChange: (matchId: string, side: 'home' | 'away', value: string) => void;
-  onSave: (matchId: string) => void;
-  saving: boolean;
-  saved: boolean;
+  onBlur: (matchId: string, home: string, away: string) => void;
+  status: SaveStatus | undefined;
   error: string | undefined;
   mobile?: boolean;
 }
 
 function MatchCard({
   match, pick, bracketPicksOpen,
-  inputs, onInputChange, onSave,
-  saving, saved, error,
+  inputs, onInputChange, onBlur,
+  status, error,
   mobile = false,
 }: MatchCardProps) {
-  const winner   = getWinner(match);
-  const isLive   = match.status === 'live';
-  const isDone   = match.status === 'finished';
-  const canEdit  = bracketPicksOpen && match.status === 'scheduled';
-
-  const hasInput = inputs.home !== '' && inputs.away !== '';
-  const isDirty  = hasInput && (
-    pick == null ||
-    String(pick.home_pick) !== inputs.home ||
-    String(pick.away_pick) !== inputs.away
-  );
-
+  const winner  = getWinner(match);
+  const isLive  = match.status === 'live';
+  const isDone  = match.status === 'finished';
+  const canEdit = bracketPicksOpen && match.status === 'scheduled';
   const showScore = isDone || isLive;
+
+  const triggerBlur = () => onBlur(match.id, inputs.home, inputs.away);
 
   return (
     <div
       className={`rounded-lg bg-white shadow-sm overflow-hidden border
         ${match.is_colombia_match ? 'border-yellow-400' : 'border-gray-200'}
         ${mobile ? 'rounded-xl border-2 shadow-md' : 'w-48'}
+        ${status === 'saved' ? 'ring-1 ring-green-300' : ''}
+        ${status === 'error' ? 'ring-1 ring-red-300'   : ''}
       `}
     >
       {/* EN VIVO banner */}
@@ -183,6 +182,7 @@ function MatchCard({
         showInput={canEdit}
         showPickReadOnly={!canEdit && !showScore && pick != null ? String(pick.home_pick) : undefined}
         onInput={v => onInputChange(match.id, 'home', v)}
+        onBlur={triggerBlur}
         mobile={mobile}
       />
 
@@ -199,6 +199,7 @@ function MatchCard({
         showInput={canEdit}
         showPickReadOnly={!canEdit && !showScore && pick != null ? String(pick.away_pick) : undefined}
         onInput={v => onInputChange(match.id, 'away', v)}
+        onBlur={triggerBlur}
         mobile={mobile}
       />
 
@@ -208,23 +209,16 @@ function MatchCard({
           {formatDate(match.kickoff_utc)}
         </span>
         <div className="flex items-center gap-1 flex-shrink-0">
-          {saved && !isDirty && (
-            <span className={`text-green-600 ${mobile ? 'text-xs' : 'text-[10px]'}`}>✓</span>
+          {status === 'saving' && (
+            <span className={`text-gray-400 ${mobile ? 'text-xs' : 'text-[9px]'}`}>Guardando…</span>
           )}
-          {error && (
-            <span className={`text-red-500 ${mobile ? 'text-xs' : 'text-[9px]'}`}>{error}</span>
+          {status === 'saved' && (
+            <span className={`text-green-600 font-medium ${mobile ? 'text-xs' : 'text-[9px]'}`}>✓ Guardado</span>
           )}
-          {canEdit && isDirty && (
-            <button
-              onClick={() => onSave(match.id)}
-              disabled={saving}
-              className={`rounded bg-[#0a4a2e] text-white font-medium
-                ${mobile ? 'px-3 py-1 text-xs' : 'px-1.5 py-0.5 text-[9px]'}
-                disabled:opacity-50
-              `}
-            >
-              {saving ? '…' : 'Guardar'}
-            </button>
+          {status === 'error' && (
+            <span className={`text-red-500 ${mobile ? 'text-xs' : 'text-[9px]'}`}>
+              ✗ {error ?? 'Error'}
+            </span>
           )}
         </div>
       </div>
@@ -250,20 +244,18 @@ interface RoundColumnProps {
   bracketPicksOpen: boolean;
   inputs: Record<string, { home: string; away: string }>;
   onInputChange: (matchId: string, side: 'home' | 'away', value: string) => void;
-  onSave: (matchId: string) => void;
-  saving: Record<string, boolean>;
-  saved: Record<string, boolean>;
+  onBlur: (matchId: string, home: string, away: string) => void;
+  statuses: Record<string, SaveStatus>;
   errors: Record<string, string>;
   isLast: boolean;
 }
 
 function RoundColumn({
   label, matches, pickMap, bracketPicksOpen,
-  inputs, onInputChange, onSave, saving, saved, errors, isLast,
+  inputs, onInputChange, onBlur, statuses, errors, isLast,
 }: RoundColumnProps) {
   return (
     <div className="flex flex-col flex-shrink-0">
-      {/* Header */}
       <div className="text-center pb-3 px-2">
         <span className="text-[11px] font-bold text-[#0a4a2e] uppercase tracking-wider">{label}</span>
         {matches.length > 0 && (
@@ -271,7 +263,6 @@ function RoundColumn({
         )}
       </div>
 
-      {/* Cards */}
       <div className={`flex flex-col gap-3 px-2 ${isLast ? 'pr-0' : ''}`}>
         {matches.length === 0 ? (
           <div className="w-48 flex items-center justify-center h-16 rounded-lg border border-dashed border-gray-200 text-xs text-gray-300">
@@ -286,9 +277,8 @@ function RoundColumn({
               bracketPicksOpen={bracketPicksOpen}
               inputs={inputs[m.id] ?? { home: '', away: '' }}
               onInputChange={onInputChange}
-              onSave={onSave}
-              saving={saving[m.id] ?? false}
-              saved={saved[m.id] ?? false}
+              onBlur={onBlur}
+              status={statuses[m.id]}
               error={errors[m.id]}
             />
           ))
@@ -297,8 +287,6 @@ function RoundColumn({
     </div>
   );
 }
-
-// ─── Column separator (desktop) ──────────────────────────────
 
 function Separator() {
   return (
@@ -316,18 +304,19 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
     return first?.phase ?? ROUNDS[0].phase;
   });
 
-  const [inputs, setInputs] = useState<Record<string, { home: string; away: string }>>(() => {
+  const initInputs = () => {
     const init: Record<string, { home: string; away: string }> = {};
     for (const [id, p] of Object.entries(pickMap)) {
       init[id] = { home: String(p.home_pick), away: String(p.away_pick) };
     }
     return init;
-  });
+  };
 
-  const [saving, setSaving]   = useState<Record<string, boolean>>({});
-  const [saved,  setSaved]    = useState<Record<string, boolean>>({});
-  const [errors, setErrors]   = useState<Record<string, string>>({});
-  const [, startTransition]   = useTransition();
+  const [inputs,    setInputs]    = useState<Record<string, { home: string; away: string }>>(initInputs);
+  const [lastSaved, setLastSaved] = useState<Record<string, { home: string; away: string }>>(initInputs);
+  const [statuses,  setStatuses]  = useState<Record<string, SaveStatus>>({});
+  const [errors,    setErrors]    = useState<Record<string, string>>({});
+  const [, startTransition] = useTransition();
 
   const handleInputChange = useCallback(
     (matchId: string, side: 'home' | 'away', value: string) => {
@@ -335,39 +324,44 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
         ...prev,
         [matchId]: { ...(prev[matchId] ?? { home: '', away: '' }), [side]: value },
       }));
-      setSaved(prev => ({ ...prev, [matchId]: false }));
+      setStatuses(prev => { const n = { ...prev }; delete n[matchId]; return n; });
+      setErrors(prev   => { const n = { ...prev }; delete n[matchId]; return n; });
     },
     [],
   );
 
-  const handleSave = useCallback(
-    (matchId: string) => {
-      const inp = inputs[matchId];
-      if (!inp || inp.home === '' || inp.away === '') return;
+  const handleBlur = useCallback(
+    (matchId: string, home: string, away: string) => {
+      if (home === '' || away === '') return;
 
-      setSaving(prev => ({ ...prev, [matchId]: true }));
+      const last = lastSaved[matchId];
+      if (last && last.home === home && last.away === away) return;
+
+      if (statuses[matchId] === 'saving') return;
+
+      setStatuses(prev => ({ ...prev, [matchId]: 'saving' }));
 
       startTransition(async () => {
         const result = await submitBulkPicksAction([
-          { match_id: matchId, home_pick: Number(inp.home), away_pick: Number(inp.away) },
+          { match_id: matchId, home_pick: Number(home), away_pick: Number(away) },
         ]);
-        setSaving(prev => ({ ...prev, [matchId]: false }));
+
         if (result.errors[matchId]) {
-          setErrors(prev => ({ ...prev, [matchId]: result.errors[matchId] }));
+          setStatuses(prev => ({ ...prev, [matchId]: 'error' }));
+          setErrors(prev   => ({ ...prev, [matchId]: result.errors[matchId] }));
         } else {
-          setSaved(prev => ({ ...prev, [matchId]: true }));
-          setErrors(prev => { const n = { ...prev }; delete n[matchId]; return n; });
+          setStatuses(prev  => ({ ...prev, [matchId]: 'saved' }));
+          setLastSaved(prev => ({ ...prev, [matchId]: { home, away } }));
         }
       });
     },
-    [inputs, startTransition],
+    [lastSaved, statuses, startTransition],
   );
 
   const matchesByPhase = Object.fromEntries(
     ROUNDS.map(r => [r.phase, matches.filter(m => m.phase === r.phase)]),
   );
 
-  // Determine champion from finished final
   const finalMatch = matchesByPhase['final']?.[0];
   const winner     = finalMatch ? getWinner(finalMatch) : null;
   const champion   =
@@ -375,7 +369,12 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
     winner === 'away' ? finalMatch!.away_team :
     null;
 
-  const sharedProps = { pickMap, bracketPicksOpen, inputs, onInputChange: handleInputChange, onSave: handleSave, saving, saved, errors };
+  const sharedProps = {
+    pickMap, bracketPicksOpen, inputs,
+    onInputChange: handleInputChange,
+    onBlur: handleBlur,
+    statuses, errors,
+  };
 
   return (
     <>
@@ -394,7 +393,6 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
             </div>
           ))}
 
-          {/* Champion */}
           {champion && (
             <div className="flex flex-col items-center justify-center pl-6 flex-shrink-0">
               <div className="flex flex-col items-center p-4 bg-[#0a4a2e] rounded-xl shadow-md">
@@ -411,7 +409,6 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
 
       {/* ── Mobile ──────────────────────────────────────────── */}
       <div className="md:hidden">
-        {/* Round selector */}
         <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
           {ROUNDS.map(round => {
             const count = matchesByPhase[round.phase]?.length ?? 0;
@@ -436,7 +433,6 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
           })}
         </div>
 
-        {/* Matches */}
         {(() => {
           const roundMatches = matchesByPhase[mobileRound] ?? [];
           if (roundMatches.length === 0) {
@@ -459,9 +455,8 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
                   bracketPicksOpen={bracketPicksOpen}
                   inputs={inputs[m.id] ?? { home: '', away: '' }}
                   onInputChange={handleInputChange}
-                  onSave={handleSave}
-                  saving={saving[m.id] ?? false}
-                  saved={saved[m.id] ?? false}
+                  onBlur={handleBlur}
+                  status={statuses[m.id]}
                   error={errors[m.id]}
                   mobile
                 />
@@ -470,7 +465,6 @@ export default function BracketView({ matches, pickMap, bracketPicksOpen }: Brac
           );
         })()}
 
-        {/* Mobile champion (shown in Final tab) */}
         {mobileRound === 'final' && champion && (
           <div className="mt-4 flex flex-col items-center p-5 bg-[#0a4a2e] rounded-xl shadow-md">
             <span className="text-4xl mb-2">🏆</span>
