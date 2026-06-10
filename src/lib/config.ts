@@ -69,67 +69,110 @@ export const COLOMBIA_ELIMINATION_PHASES = [
 export type ColombiaEliminationPhase = (typeof COLOMBIA_ELIMINATION_PHASES)[number];
 
 export const WC2026_GOALKEEPERS = [
-  // CONMEBOL
+  // Argentina
   'Emiliano Martínez (Argentina)', 'Gerónimo Rulli (Argentina)', 'Juan Musso (Argentina)',
+  // Australia
+  'Mathew Ryan (Australia)', 'Paul Izzo (Australia)', 'Patrick Beach (Australia)',
+  // Austria
+  'Patrick Pentz (Austria)', 'Alexander Schlager (Austria)', 'Florian Wiegele (Austria)',
+  // Belgium
+  'Thibaut Courtois (Bélgica)', 'Senne Lammens (Bélgica)', 'Mike Penders (Bélgica)',
+  // Bosnia
+  'Nikola Vasilj (Bosnia)', 'Martin Zlomislic (Bosnia)', 'Osman Hadzikic (Bosnia)',
+  // Brazil
   'Alisson (Brasil)', 'Ederson (Brasil)', 'Weverton (Brasil)',
-  'Camilo Vargas (Colombia)', 'Álvaro Montero (Colombia)', 'David Ospina (Colombia)', 'Devis Vásquez (Colombia)',
-  'Hernán Galíndez (Ecuador)', 'Alexander Domínguez (Ecuador)', 'Carlos Morales (Ecuador)',
-  'Pedro Gallese (Perú)', 'José Carvallo (Perú)',
-  'Sergio Rochet (Uruguay)', 'Guillermo de Amores (Uruguay)',
-  'Wuilker Faríñez (Venezuela)', 'Rafael Romo (Venezuela)',
-  // CONCACAF
-  'Guillermo Ochoa (México)', 'Carlos Acevedo (México)', 'Raúl Rangel (México)',
-  'Chris Brady (USA)', 'Matt Freese (USA)', 'Matt Turner (USA)',
-  'Patrick Pemberton (Costa Rica)', 'Esteban Alvarado (Costa Rica)',
-  'Kevin Chamorro (Panamá)', 'Luis Mejía (Panamá)',
-  'Harold Fonseca (Honduras)', 'Edrick Menjívar (Honduras)',
-  'Andre Blake (Jamaica)', 'Dillon Barnes (Jamaica)',
-  // UEFA
-  'Thibaut Courtois (Bélgica)', 'Senne Lammens (Bélgica)',
-  'Mike Maignan (Francia)', 'Brice Samba (Francia)',
-  'Manuel Neuer (Alemania)', 'Oliver Baumann (Alemania)',
-  'Unai Simón (España)', 'David Raya (España)',
-  'Diogo Costa (Portugal)', 'José Sá (Portugal)',
-  'Jordan Pickford (Inglaterra)', 'Dean Henderson (Inglaterra)',
-  'Gianluigi Donnarumma (Italia)', 'Alex Meret (Italia)',
-  'Dominik Livaković (Croacia)', 'Nediljko Labrović (Croacia)',
-  'Patrick Pentz (Austria)', 'Heinz Lindner (Austria)',
-  'Yann Sommer (Suiza)', 'Yvon Mvogo (Suiza)',
-  'Predrag Rajković (Serbia)', 'Vanja Milinković-Savić (Serbia)',
-  'Péter Gulácsi (Hungría)', 'Dénes Dibusz (Hungría)',
-  'Marek Rodák (Eslovaquia)', 'Martin Dúbravka (Eslovaquia)',
-  'Kasper Schmeichel (Dinamarca)', 'Frederik Rønnow (Dinamarca)',
-  'Mert Günok (Turquía)', 'Altay Bayındır (Turquía)',
-  'Andriy Lunin (Ucrania)', 'Anatolii Trubin (Ucrania)',
-  // CAF
-  'Yassine Bounou (Marruecos)', 'Ahmed Reda Tagnaouti (Marruecos)',
-  'Edouard Mendy (Senegal)', 'Seny Dieng (Senegal)',
-  'Gabaski (Egipto)', 'Mohamed El Shenawy (Egipto)',
-  'Stanley Nwabali (Nigeria)', 'John Noble (Nigeria)',
-  'Ronwen Williams (Sudáfrica)', 'Sipho Chaine (Sudáfrica)',
-  'Yahia Fofana (Argelia)', 'Samir Kadri (Argelia)',
-  'André Onana (Camerún)', 'Simon Ngapandouetnbu (Camerún)',
-  'Aymen Dahmen (Túnez)', 'Bechir Ben Said (Túnez)',
-  'Djigui Diarra (Mali)', 'Ibrahim Mounkoro (Mali)',
-  // AFC
-  'Shuichi Gonda (Japón)', 'Zion Suzuki (Japón)',
-  'Kim Seung-gyu (Corea del Sur)', 'Jo Hyeon-woo (Corea del Sur)',
-  'Alireza Beiranvand (Irán)', 'Hossein Hosseini (Irán)',
-  'Mohammed Al-Owais (Arabia Saudita)', 'Mohammed Al-Rubaie (Arabia Saudita)',
-  'Mat Ryan (Australia)', 'Joe Gauci (Australia)',
-  'Ernando Ari (Indonesia)', 'Cahya Supriadi (Indonesia)',
-  'Wang Dalei (China)', 'Yan Junling (China)',
-  'Eldorbek Sobirov (Uzbekistán)', 'Shohjahon Ergashev (Uzbekistán)',
-  // OFC
-  'Oliver Sail (Nueva Zelanda)', 'Max Crocombe (Nueva Zelanda)',
+  // Canada
+  'Dayne St Clair (Canadá)', 'Maxime Crepeau (Canadá)', 'Owen Goodman (Canadá)',
+  // Cape Verde
+  'Vozinha (Cabo Verde)', 'Marcio Rosa (Cabo Verde)', 'CJ dos Santos (Cabo Verde)',
+  // Colombia
+  'Camilo Vargas (Colombia)', 'Álvaro Montero (Colombia)', 'David Ospina (Colombia)',
+  // Costa Rica
+  'Patrick Pemberton (Costa Rica)', 'Esteban Alvarado (Costa Rica)', 'Aaron Cruz (Costa Rica)',
+  // Croatia
+  'Dominik Livaković (Croacia)', 'Dominik Kotarski (Croacia)', 'Ivor Pandur (Croacia)',
+  // Curacao
+  'Eloy Room (Curazao)', 'Tyrick Bodack (Curazao)', 'Trevor Doornbusch (Curazao)',
+  // Czechia
+  'Jindřich Staněk (Chequia)', 'Matěj Kovář (Chequia)', 'Lukáš Horníček (Chequia)',
+  // DR Congo
+  'Matthieu Epolo (R.D. Congo)', 'Timothy Fayulu (R.D. Congo)', 'Lionel Mpasi (R.D. Congo)',
+  // Ecuador
+  'Hernán Galíndez (Ecuador)', 'Moisés Ramírez (Ecuador)', 'Gonzalo Valle (Ecuador)',
+  // Egypt
+  'Mohamed El Shenawy (Egipto)', 'Mostafa Shobeir (Egipto)', 'El Mahdy Soliman (Egipto)',
+  // England
+  'Jordan Pickford (Inglaterra)', 'Dean Henderson (Inglaterra)', 'James Trafford (Inglaterra)',
+  // France
+  'Mike Maignan (Francia)', 'Brice Samba (Francia)', 'Robin Risser (Francia)',
+  // Germany
+  'Manuel Neuer (Alemania)', 'Oliver Baumann (Alemania)', 'Alexander Nübel (Alemania)',
+  // Ghana
+  'Lawrence Ati-Zigi (Ghana)', 'Joseph Anang (Ghana)', 'Benjamin Asare (Ghana)',
+  // Haiti
+  'Johny Placide (Haití)', 'Alexandre Pierre (Haití)', 'Josue Duverger (Haití)',
+  // Honduras
+  'Harold Fonseca (Honduras)', 'Edrick Menjívar (Honduras)', 'Kevin Caballero (Honduras)',
+  // Indonesia
+  'Ernando Ari (Indonesia)', 'Cahya Supriadi (Indonesia)', 'Syahrul Trisna (Indonesia)',
+  // Iran
+  'Alireza Beiranvand (Irán)', 'Seyed Hossein Hosseini (Irán)', 'Payam Niazmand (Irán)',
+  // Iraq
+  'Fahad Talib (Irak)', 'Jalal Hassan (Irak)', 'Ahmed Basil (Irak)',
+  // Ivory Coast
+  'Yahia Fofana (Costa de Marfil)', 'Alban Lafont (Costa de Marfil)', 'Mohamed Kone (Costa de Marfil)',
+  // Jamaica
+  'Andre Blake (Jamaica)', 'Dillon Barnes (Jamaica)', 'Jahmali Waite (Jamaica)',
+  // Japan
+  'Zion Suzuki (Japón)', 'Keisuke Osako (Japón)', 'Tomoki Hayakawa (Japón)',
+  // Jordan
+  'Yazid Abulaila (Jordania)', 'Noor Bani Attiah (Jordania)', 'Abdallah Al Fakhouri (Jordania)',
+  // Mexico
+  'Raúl Rangel (México)', 'Guillermo Ochoa (México)', 'Carlos Acevedo (México)',
+  // Morocco
+  'Yassine Bounou (Marruecos)', 'Munir El Kajoui (Marruecos)', 'Ahmed Reda Tagnaouti (Marruecos)',
+  // Netherlands
+  'Bart Verbruggen (Países Bajos)', 'Mark Flekken (Países Bajos)', 'Robin Roefs (Países Bajos)',
+  // New Zealand
+  'Max Crocombe (Nueva Zelanda)', 'Michael Woud (Nueva Zelanda)', 'Alex Paulsen (Nueva Zelanda)',
+  // Panama
+  'Kevin Chamorro (Panamá)', 'Luis Mejía (Panamá)', 'Orlando Mosquera (Panamá)',
+  // Portugal
+  'Diogo Costa (Portugal)', 'José Sá (Portugal)', 'Rui Patrício (Portugal)',
+  // Saudi Arabia
+  'Mohammed Al-Owais (Arabia Saudita)', 'Mohammed Al-Rubaie (Arabia Saudita)', 'Fawaz Al-Qarni (Arabia Saudita)',
+  // Senegal
+  'Edouard Mendy (Senegal)', 'Seny Dieng (Senegal)', 'Boubacar Fall (Senegal)',
+  // Serbia
+  'Predrag Rajković (Serbia)', 'Vanja Milinković-Savić (Serbia)', 'Nikola Milovanović (Serbia)',
+  // Slovakia
+  'Marek Rodák (Eslovaquia)', 'Martin Dúbravka (Eslovaquia)', 'Henrich Ravas (Eslovaquia)',
+  // South Africa
+  'Ronwen Williams (Sudáfrica)', 'Ricardo Goss (Sudáfrica)', 'Sipho Chaine (Sudáfrica)',
+  // South Korea
+  'Kim Seung-gyu (Corea del Sur)', 'Jo Hyeon-woo (Corea del Sur)', 'Song Bum-keun (Corea del Sur)',
+  // Spain
+  'Unai Simón (España)', 'David Raya (España)', 'Álex Remiro (España)',
+  // Switzerland
+  'Yann Sommer (Suiza)', 'Yvon Mvogo (Suiza)', 'Jonas Omlin (Suiza)',
+  // Turkey
+  'Mert Günok (Turquía)', 'Altay Bayındır (Turquía)', 'Berke Özer (Turquía)',
+  // Ukraine
+  'Andriy Lunin (Ucrania)', 'Anatolii Trubin (Ucrania)', 'Georgiy Bushchan (Ucrania)',
+  // United States
+  'Chris Brady (Estados Unidos)', 'Matt Freese (Estados Unidos)', 'Matt Turner (Estados Unidos)',
+  // Uruguay
+  'Sergio Rochet (Uruguay)', 'Guillermo de Amores (Uruguay)', 'Santiago Mele (Uruguay)',
+  // Uzbekistan
+  'Eldorbek Sobirov (Uzbekistán)', 'Shohjahon Ergashev (Uzbekistán)', 'Alisher Umarov (Uzbekistán)',
 ] as const;
 
 export const WC2026_COLOMBIA_SQUAD = [
-  'Camilo Vargas', 'Álvaro Montero', 'David Ospina', 'Devis Vásquez',
-  'Daniel Muñoz', 'Santiago Arias', 'Yerry Mina', 'Davinson Sánchez',
-  'Jhon Lucumí', 'Johan Mojica', 'Cristian Borja', 'Óscar Murillo',
-  'James Rodríguez', 'Richard Ríos', 'Jhon Arias', 'Mateus Uribe',
-  'Juan Fernando Quintero', 'Wilmar Barrios', 'Gustavo Puerta',
-  'Luis Díaz', 'Cucho Hernández', 'Rafael Santos Borré',
-  'Jhon Córdoba', 'Dayro Moreno', 'Déiver Machado', 'Carlos Cuesta',
+  'Camilo Vargas', 'Álvaro Montero', 'David Ospina',
+  'Dávinson Sánchez', 'Jhon Lucumí', 'Yerry Mina', 'Willer Ditta',
+  'Daniel Muñoz', 'Santiago Arias', 'Johan Mojica', 'Déiver Machado',
+  'Richard Ríos', 'Jefferson Lerma', 'Kevin Castaño', 'Juan Camilo Portilla',
+  'Gustavo Puerta', 'Jhon Arias', 'Jorge Carrascal', 'Juan Fernando Quintero',
+  'James Rodríguez', 'Jaminton Campaz',
+  'Juan Camilo Hernández', 'Luis Díaz', 'Luis Suárez', 'Carlos Gómez', 'Jhon Córdoba',
 ] as const;
