@@ -14,6 +14,9 @@ export const REGISTRATION_DEADLINE = new Date('2026-06-11T04:59:00Z');
 // Tournament kickoff: June 11, 2026 at 8:00 PM Mexico City time (UTC-6)
 export const TOURNAMENT_KICKOFF = new Date('2026-06-12T02:00:00Z');
 
+// Special picks reveal: June 11, 2026 at 14:00 Colombia time (UTC-5) = 19:00 UTC
+export const SPECIAL_PICKS_REVEAL = new Date('2026-06-11T19:00:00Z');
+
 // Pick lock window: 1 hour before kickoff
 export const PICK_LOCK_MINUTES = 60;
 

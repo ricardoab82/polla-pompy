@@ -38,6 +38,7 @@ export default async function TopBar() {
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
           <Link href="/dashboard" className="hover:text-[#0a4a2e] transition-colors">Inicio</Link>
           <Link href="/picks"           className="hover:text-[#0a4a2e] transition-colors">Picks</Link>
+          <Link href="/special-picks"   className="hover:text-[#0a4a2e] transition-colors">Picks Esp.</Link>
           <Link href="/bracket"         className="hover:text-[#0a4a2e] transition-colors">Llaves</Link>
           <Link href="/standings"       className="hover:text-[#0a4a2e] transition-colors">Posiciones</Link>
           <Link href="/bonus-standings" className="hover:text-[#0a4a2e] transition-colors">Bonus</Link>

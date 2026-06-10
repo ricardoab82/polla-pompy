@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const NAV_ITEMS = [
   { href: '/dashboard',       label: 'Inicio',     icon: '🏠' },
   { href: '/picks',           label: 'Picks',      icon: '⚽' },
+  { href: '/special-picks',   label: 'Picks Esp.', icon: '🌟' },
   { href: '/bracket',         label: 'Llaves',     icon: '🏆' },
   { href: '/standings',       label: 'Posiciones', icon: '📊' },
   { href: '/bonus-standings', label: 'Bonus',      icon: '🎯' },
