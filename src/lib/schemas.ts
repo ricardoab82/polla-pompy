@@ -20,10 +20,11 @@ export const PickSchema = z.object({
 export const SpecialPicksSchema = z.object({
   champion:                  z.string().min(2),
   runner_up:                 z.string().min(2),
+  third_place:               z.string().min(2).optional(),
+  fourth_place:              z.string().min(2).optional(),
   top_scorer:                z.string().min(2).max(100),
   golden_ball:               z.string().min(2).max(100),
-  fourth_place:              z.string().min(2).optional(),
-  best_defense:              z.string().min(2).optional(),
+  golden_glove:              z.string().min(2).max(100).optional(),
   colombia_eliminated_phase: z.string().min(2).optional(),
   colombia_top_scorer:       z.string().min(2).max(100).optional(),
 });

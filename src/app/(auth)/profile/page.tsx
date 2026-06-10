@@ -88,14 +88,15 @@ export default async function ProfilePage() {
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
             {[
-              { label: '🏆 Campeón',              value: specialPicks.champion,                    pts: specialPicks.champion_pts              ?? null, max: 20 },
-              { label: '🥈 Subcampeón',            value: specialPicks.runner_up,                   pts: specialPicks.runner_up_pts             ?? null, max: 10 },
-              { label: '👟 Goleador',              value: specialPicks.top_scorer,                  pts: specialPicks.top_scorer_pts            ?? null, max: 10 },
-              { label: '⭐ Balón de Oro',           value: specialPicks.golden_ball,                 pts: specialPicks.golden_ball_pts           ?? null, max: 5  },
-              { label: '🥉 Cuarto puesto',            value: specialPicks.fourth_place,                pts: specialPicks.fourth_place_pts          ?? null, max: 5  },
-              { label: '🛡️ Menos goles en contra', value: specialPicks.best_defense,                pts: specialPicks.best_defense_pts          ?? null, max: 5  },
-              { label: '🇨🇴 Eliminación Colombia', value: specialPicks.colombia_eliminated_phase,   pts: specialPicks.colombia_eliminated_pts   ?? null, max: 10 },
-              { label: '⚽ Goleador Colombia',      value: specialPicks.colombia_top_scorer,         pts: specialPicks.colombia_top_scorer_pts   ?? null, max: 8  },
+              { label: '🏆 Campeón',              value: specialPicks.champion,                  pts: specialPicks.champion_pts            ?? null, max: 20 },
+              { label: '🥈 Subcampeón',            value: specialPicks.runner_up,                 pts: specialPicks.runner_up_pts           ?? null, max: 10 },
+              { label: '🥉 Tercer puesto',          value: specialPicks.third_place,               pts: specialPicks.third_place_pts         ?? null, max: 5  },
+              { label: '4️⃣ Cuarto puesto',         value: specialPicks.fourth_place,              pts: specialPicks.fourth_place_pts        ?? null, max: 5  },
+              { label: '👟 Goleador',              value: specialPicks.top_scorer,                pts: specialPicks.top_scorer_pts          ?? null, max: 10 },
+              { label: '⭐ Balón de Oro',           value: specialPicks.golden_ball,               pts: specialPicks.golden_ball_pts         ?? null, max: 5  },
+              { label: '🧤 Guante de Oro',          value: specialPicks.golden_glove,              pts: specialPicks.golden_glove_pts        ?? null, max: 5  },
+              { label: '🇨🇴 Eliminación Colombia', value: specialPicks.colombia_eliminated_phase, pts: specialPicks.colombia_eliminated_pts ?? null, max: 10 },
+              { label: '⚽ Goleador Colombia',      value: specialPicks.colombia_top_scorer,       pts: specialPicks.colombia_top_scorer_pts ?? null, max: 8  },
             ].filter((item) => item.value).map((item) => (
               <div key={item.label} className="bg-gray-50 rounded-xl p-3">
                 <p className="text-xs text-gray-500 mb-1">{item.label}</p>
@@ -115,8 +116,9 @@ export default async function ProfilePage() {
                 runner_up:                 specialPicks.runner_up,
                 top_scorer:                specialPicks.top_scorer,
                 golden_ball:               specialPicks.golden_ball,
+                third_place:               specialPicks.third_place,
                 fourth_place:              specialPicks.fourth_place,
-                best_defense:              specialPicks.best_defense,
+                golden_glove:              specialPicks.golden_glove,
                 colombia_eliminated_phase: specialPicks.colombia_eliminated_phase,
                 colombia_top_scorer:       specialPicks.colombia_top_scorer,
               }}

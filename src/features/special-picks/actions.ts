@@ -14,10 +14,11 @@ export async function submitSpecialPicksAction(formData: FormData) {
   const raw = {
     champion:                  formData.get('champion') as string,
     runner_up:                 formData.get('runner_up') as string,
+    third_place:               (formData.get('third_place') as string) || undefined,
+    fourth_place:              (formData.get('fourth_place') as string) || undefined,
     top_scorer:                formData.get('top_scorer') as string,
     golden_ball:               formData.get('golden_ball') as string,
-    fourth_place:              (formData.get('golden_glove') as string) || undefined,
-    best_defense:              (formData.get('best_defense') as string) || undefined,
+    golden_glove:              (formData.get('golden_glove') as string) || undefined,
     colombia_eliminated_phase: (formData.get('colombia_eliminated_phase') as string) || undefined,
     colombia_top_scorer:       (formData.get('colombia_top_scorer') as string) || undefined,
   };
@@ -65,10 +66,11 @@ export async function updateSpecialPicksAction(formData: FormData) {
   const raw = {
     champion:                  formData.get('champion') as string,
     runner_up:                 formData.get('runner_up') as string,
+    third_place:               (formData.get('third_place') as string) || undefined,
+    fourth_place:              (formData.get('fourth_place') as string) || undefined,
     top_scorer:                formData.get('top_scorer') as string,
     golden_ball:               formData.get('golden_ball') as string,
-    fourth_place:              (formData.get('golden_glove') as string) || undefined,
-    best_defense:              (formData.get('best_defense') as string) || undefined,
+    golden_glove:              (formData.get('golden_glove') as string) || undefined,
     colombia_eliminated_phase: (formData.get('colombia_eliminated_phase') as string) || undefined,
     colombia_top_scorer:       (formData.get('colombia_top_scorer') as string) || undefined,
   };

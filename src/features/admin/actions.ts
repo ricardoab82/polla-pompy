@@ -214,18 +214,19 @@ export async function gradeSpecialPicksAction(formData: FormData) {
   const { error, supabase } = await requireAdmin();
   if (error || !supabase) return { error };
 
-  const champion               = (formData.get('champion') as string).trim();
-  const runnerUp               = (formData.get('runner_up') as string).trim();
-  const topScorer              = (formData.get('top_scorer') as string).trim();
-  const goldenBall             = (formData.get('golden_ball') as string).trim();
-  const fourthPlace            = (formData.get('fourth_place') as string).trim();
-  const bestDefense            = (formData.get('best_defense') as string).trim();
-  const colombiaEliminated     = (formData.get('colombia_eliminated_phase') as string).trim();
-  const colombiaTopScorer      = (formData.get('colombia_top_scorer') as string).trim();
+  const champion           = (formData.get('champion') as string).trim();
+  const runnerUp           = (formData.get('runner_up') as string).trim();
+  const thirdPlace         = (formData.get('third_place') as string).trim();
+  const fourthPlace        = (formData.get('fourth_place') as string).trim();
+  const topScorer          = (formData.get('top_scorer') as string).trim();
+  const goldenBall         = (formData.get('golden_ball') as string).trim();
+  const goldenGlove        = (formData.get('golden_glove') as string).trim();
+  const colombiaEliminated = (formData.get('colombia_eliminated_phase') as string).trim();
+  const colombiaTopScorer  = (formData.get('colombia_top_scorer') as string).trim();
 
   const { data: allSpecialPicks } = await supabase
     .from('special_picks')
-    .select('id, champion, runner_up, top_scorer, golden_ball, fourth_place, best_defense, colombia_eliminated_phase, colombia_top_scorer');
+    .select('id, champion, runner_up, third_place, fourth_place, top_scorer, golden_ball, golden_glove, colombia_eliminated_phase, colombia_top_scorer');
 
   if (!allSpecialPicks) return { error: 'No special picks found' };
 
@@ -236,12 +237,13 @@ export async function gradeSpecialPicksAction(formData: FormData) {
       .update({
         champion_pts:            sp.champion                    === champion           ? 20 : 0,
         runner_up_pts:           sp.runner_up                   === runnerUp           ? 10 : 0,
+        third_place_pts:         thirdPlace  && sp.third_place  === thirdPlace         ?  5 : 0,
+        fourth_place_pts:        fourthPlace && sp.fourth_place === fourthPlace        ?  5 : 0,
         top_scorer_pts:          sp.top_scorer                  === topScorer          ? 10 : 0,
         golden_ball_pts:         sp.golden_ball                 === goldenBall         ?  5 : 0,
-        fourth_place_pts:        fourthPlace && sp.fourth_place              === fourthPlace        ?  5 : 0,
-        best_defense_pts:        bestDefense && sp.best_defense              === bestDefense        ?  5 : 0,
+        golden_glove_pts:        goldenGlove && sp.golden_glove === goldenGlove        ?  5 : 0,
         colombia_eliminated_pts: colombiaEliminated && sp.colombia_eliminated_phase === colombiaEliminated ? 10 : 0,
-        colombia_top_scorer_pts: colombiaTopScorer && sp.colombia_top_scorer          === colombiaTopScorer ?  8 : 0,
+        colombia_top_scorer_pts: colombiaTopScorer  && sp.colombia_top_scorer         === colombiaTopScorer ?  8 : 0,
       })
       .eq('id', sp.id);
 

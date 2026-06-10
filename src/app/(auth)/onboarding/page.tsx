@@ -105,7 +105,7 @@ export default function OnboardingPage() {
                 </p>
               </div>
 
-              {/* Champion */}
+              {/* 1. Champion */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   🏆 Campeón <span className="text-[#0a4a2e] font-bold">+20 pts</span>
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
                 </select>
               </div>
 
-              {/* Runner-up */}
+              {/* 2. Runner-up */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   🥈 Subcampeón <span className="text-[#0a4a2e] font-bold">+10 pts</span>
@@ -147,7 +147,45 @@ export default function OnboardingPage() {
                 </select>
               </div>
 
-              {/* Top scorer */}
+              {/* 3. Third place */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  🥉 Tercer puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+                </label>
+                <select
+                  name="third_place"
+                  required
+                  defaultValue=""
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
+                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
+                >
+                  <option value="">Selecciona un equipo...</option>
+                  {WC2026_TEAMS.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 4. Fourth place */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  4️⃣ Cuarto puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+                </label>
+                <select
+                  name="fourth_place"
+                  required
+                  defaultValue=""
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
+                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
+                >
+                  <option value="">Selecciona un equipo...</option>
+                  {WC2026_TEAMS.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 5. Top scorer */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   👟 Goleador del torneo <span className="text-[#0a4a2e] font-bold">+10 pts</span>
@@ -164,7 +202,7 @@ export default function OnboardingPage() {
                 />
               </div>
 
-              {/* Golden ball */}
+              {/* 6. Golden ball */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   ⭐ Balón de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
@@ -181,45 +219,24 @@ export default function OnboardingPage() {
                 />
               </div>
 
-              {/* Fourth place */}
+              {/* 7. Golden glove */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  🥉 Cuarto puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+                  🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
                 </label>
-                <select
-                  name="fourth_place"
+                <input
+                  type="text"
+                  name="golden_glove"
                   required
-                  defaultValue=""
+                  minLength={2}
+                  maxLength={100}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5
                              focus:border-[#0a4a2e] focus:outline-none transition-colors"
-                >
-                  <option value="">Selecciona un equipo...</option>
-                  {WC2026_TEAMS.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
+                  placeholder="Nombre del portero"
+                />
               </div>
 
-              {/* Best defense */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  🛡️ Menos goles en contra <span className="text-[#0a4a2e] font-bold">+5 pts</span>
-                </label>
-                <select
-                  name="best_defense"
-                  required
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
-                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
-                  defaultValue=""
-                >
-                  <option value="">Selecciona un equipo...</option>
-                  {WC2026_TEAMS.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Colombia elimination phase */}
+              {/* 8. Colombia elimination phase */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   🇨🇴 Fase eliminación Colombia <span className="text-[#0a4a2e] font-bold">+10 pts</span>
@@ -227,9 +244,9 @@ export default function OnboardingPage() {
                 <select
                   name="colombia_eliminated_phase"
                   required
+                  defaultValue=""
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5
                              focus:border-[#0a4a2e] focus:outline-none transition-colors"
-                  defaultValue=""
                 >
                   <option value="">Selecciona una fase...</option>
                   {COLOMBIA_ELIMINATION_PHASES.map((p) => (
@@ -238,7 +255,7 @@ export default function OnboardingPage() {
                 </select>
               </div>
 
-              {/* Colombia top scorer */}
+              {/* 9. Colombia top scorer */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   ⚽ Goleador de Colombia <span className="text-[#0a4a2e] font-bold">+8 pts</span>

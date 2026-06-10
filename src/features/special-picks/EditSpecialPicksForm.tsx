@@ -9,8 +9,9 @@ interface CurrentPicks {
   runner_up:   string;
   top_scorer:  string;
   golden_ball: string;
+  third_place:               string | null;
   fourth_place:              string | null;
-  best_defense:              string | null;
+  golden_glove:              string | null;
   colombia_eliminated_phase: string | null;
   colombia_top_scorer:       string | null;
 }
@@ -53,7 +54,8 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
     setRunnerUp(initialPicks.runner_up);
   }
 
-  const inputCls = 'w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:border-[#0a4a2e] focus:outline-none transition-colors';
+  const sel = 'w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:border-[#0a4a2e] focus:outline-none transition-colors';
+  const inp = sel;
 
   if (!isEditing) {
     return (
@@ -77,27 +79,18 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
     <form onSubmit={handleSubmit} className="mt-4 space-y-4 border-t border-gray-100 pt-4">
       <p className="text-sm font-semibold text-gray-700">Editar picks especiales</p>
 
-      {/* Champion */}
+      {/* 1. Champion */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           🏆 Campeón <span className="text-[#0a4a2e] font-bold">+20 pts</span>
         </label>
-        <select
-          name="champion"
-          required
-          value={champion}
-          onChange={handleChampionChange}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5
-                     focus:border-[#0a4a2e] focus:outline-none transition-colors"
-        >
+        <select name="champion" required value={champion} onChange={handleChampionChange} className={sel}>
           <option value="">Selecciona un equipo...</option>
-          {WC2026_TEAMS.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
+          {WC2026_TEAMS.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
-      {/* Runner-up */}
+      {/* 2. Runner-up */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           🥈 Subcampeón <span className="text-[#0a4a2e] font-bold">+10 pts</span>
@@ -108,119 +101,87 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
           value={runnerUp}
           onChange={(e) => setRunnerUp(e.target.value)}
           disabled={!champion}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5
-                     focus:border-[#0a4a2e] focus:outline-none transition-colors
-                     disabled:opacity-50"
+          className={`${sel} disabled:opacity-50`}
         >
-          <option value="">
-            {champion ? 'Selecciona un equipo...' : 'Primero selecciona el campeón'}
-          </option>
-          {availableForRunnerUp.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
+          <option value="">{champion ? 'Selecciona un equipo...' : 'Primero selecciona el campeón'}</option>
+          {availableForRunnerUp.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
-      {/* Top scorer */}
+      {/* 3. Third place */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          🥉 Tercer puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+        </label>
+        <select name="third_place" defaultValue={initialPicks.third_place ?? ''} className={sel}>
+          <option value="">Selecciona un equipo...</option>
+          {WC2026_TEAMS.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+
+      {/* 4. Fourth place */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          4️⃣ Cuarto puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+        </label>
+        <select name="fourth_place" defaultValue={initialPicks.fourth_place ?? ''} className={sel}>
+          <option value="">Selecciona un equipo...</option>
+          {WC2026_TEAMS.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+
+      {/* 5. Top scorer */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           👟 Goleador del torneo <span className="text-[#0a4a2e] font-bold">+10 pts</span>
         </label>
         <input
-          type="text"
-          name="top_scorer"
-          required
-          minLength={2}
-          maxLength={100}
-          defaultValue={initialPicks.top_scorer}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5
-                     focus:border-[#0a4a2e] focus:outline-none transition-colors"
-          placeholder="Nombre del jugador"
+          type="text" name="top_scorer" required minLength={2} maxLength={100}
+          defaultValue={initialPicks.top_scorer} className={inp} placeholder="Nombre del jugador"
         />
       </div>
 
-      {/* Golden ball */}
+      {/* 6. Golden ball */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           ⭐ Balón de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
         </label>
         <input
-          type="text"
-          name="golden_ball"
-          required
-          minLength={2}
-          maxLength={100}
-          defaultValue={initialPicks.golden_ball}
-          className={inputCls}
-          placeholder="Nombre del jugador"
+          type="text" name="golden_ball" required minLength={2} maxLength={100}
+          defaultValue={initialPicks.golden_ball} className={inp} placeholder="Nombre del jugador"
         />
       </div>
 
-      {/* Fourth place */}
+      {/* 7. Golden glove */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          🥉 Cuarto puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+          🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
         </label>
-        <select
-          name="fourth_place"
-          defaultValue={initialPicks.fourth_place ?? ''}
-          className={inputCls}
-        >
-          <option value="">Selecciona un equipo...</option>
-          {WC2026_TEAMS.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
+        <input
+          type="text" name="golden_glove" minLength={2} maxLength={100}
+          defaultValue={initialPicks.golden_glove ?? ''} className={inp} placeholder="Nombre del portero"
+        />
       </div>
 
-      {/* Best defense */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          🛡️ Menos goles en contra <span className="text-[#0a4a2e] font-bold">+5 pts</span>
-        </label>
-        <select
-          name="best_defense"
-          defaultValue={initialPicks.best_defense ?? ''}
-          className={inputCls}
-        >
-          <option value="">Selecciona un equipo...</option>
-          {WC2026_TEAMS.map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Colombia elimination phase */}
+      {/* 8. Colombia elimination phase */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           🇨🇴 Fase eliminación Colombia <span className="text-[#0a4a2e] font-bold">+10 pts</span>
         </label>
-        <select
-          name="colombia_eliminated_phase"
-          defaultValue={initialPicks.colombia_eliminated_phase ?? ''}
-          className={inputCls}
-        >
+        <select name="colombia_eliminated_phase" defaultValue={initialPicks.colombia_eliminated_phase ?? ''} className={sel}>
           <option value="">Selecciona una fase...</option>
-          {COLOMBIA_ELIMINATION_PHASES.map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
+          {COLOMBIA_ELIMINATION_PHASES.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
 
-      {/* Colombia top scorer */}
+      {/* 9. Colombia top scorer */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           ⚽ Goleador de Colombia <span className="text-[#0a4a2e] font-bold">+8 pts</span>
         </label>
-        <select
-          name="colombia_top_scorer"
-          defaultValue={initialPicks.colombia_top_scorer ?? ''}
-          className={inputCls}
-        >
+        <select name="colombia_top_scorer" defaultValue={initialPicks.colombia_top_scorer ?? ''} className={sel}>
           <option value="">Selecciona un jugador...</option>
-          {WC2026_COLOMBIA_SQUAD.map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
+          {WC2026_COLOMBIA_SQUAD.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
 
@@ -231,11 +192,7 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
       )}
 
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="btn-ghost rounded-lg py-2.5 px-4 flex-none"
-        >
+        <button type="button" onClick={handleCancel} className="btn-ghost rounded-lg py-2.5 px-4 flex-none">
           Cancelar
         </button>
         <button type="submit" disabled={pending} className="btn-primary flex-1 rounded-lg py-2.5">
