@@ -7,9 +7,9 @@ export const FEATURES = {
   colombiaHighlight: true,
 } as const;
 
-// Registration deadline: June 10, 2026 at 23:59 Colombia time (UTC-5)
-// = June 11, 2026 04:59 UTC
-export const REGISTRATION_DEADLINE = new Date('2026-06-11T04:59:00Z');
+// Registration deadline: June 11, 2026 at 13:45 Colombia time (UTC-5)
+// = 15 minutes before first kickoff = 18:45 UTC
+export const REGISTRATION_DEADLINE = new Date('2026-06-11T18:45:00Z');
 
 // Tournament kickoff: June 11, 2026 at 8:00 PM Mexico City time (UTC-6)
 export const TOURNAMENT_KICKOFF = new Date('2026-06-12T02:00:00Z');
@@ -17,8 +17,8 @@ export const TOURNAMENT_KICKOFF = new Date('2026-06-12T02:00:00Z');
 // Special picks reveal: June 11, 2026 at 14:00 Colombia time (UTC-5) = 19:00 UTC
 export const SPECIAL_PICKS_REVEAL = new Date('2026-06-11T19:00:00Z');
 
-// Pick lock window: 1 hour before kickoff
-export const PICK_LOCK_MINUTES = 60;
+// Pick lock window: 15 minutes before kickoff
+export const PICK_LOCK_MINUTES = 15;
 
 // Reminder window: 2 hours before lock (= 3 hours before kickoff)
 export const REMINDER_HOURS_BEFORE_LOCK = 2;

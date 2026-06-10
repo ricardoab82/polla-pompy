@@ -94,7 +94,7 @@ export default function LandingPage() {
               {
                 icon:  '⚽',
                 title: 'Predice los resultados',
-                desc:  'Ingresa el marcador exacto para cada partido antes del cierre (1 hora antes del pitazo).',
+                desc:  'Ingresa el marcador exacto para cada partido antes del cierre (15 minutos antes del pitazo).',
               },
               {
                 icon:  '🏆',

@@ -81,7 +81,7 @@ export async function sendPickReminder(
       <h2 style="color: #0a4a2e;">⏰ Hola ${displayName}, aún no has ingresado tu pick</h2>
       <p style="font-size:18px;"><strong>${homeTeam}</strong> vs <strong>${awayTeam}</strong></p>
       <p>El partido comienza a las <strong>${kickoffCo} (hora Colombia)</strong>.</p>
-      <p>Tu pick cierra <strong>1 hora antes del pitazo</strong>. ¡Date prisa!</p>
+      <p>Tu pick cierra <strong>15 minutos antes del pitazo</strong>. ¡Date prisa!</p>
       <a href="${appUrl}/picks/${matchId}"
          style="background:#0a4a2e;color:#f5c842;padding:12px 24px;
                 border-radius:8px;text-decoration:none;display:inline-block;margin:16px 0;">
