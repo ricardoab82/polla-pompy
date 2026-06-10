@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { submitSpecialPicksAction, updateDisplayNameAction } from '@/features/special-picks/actions';
-import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES } from '@/lib/config';
+import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES, WC2026_GOALKEEPERS, WC2026_COLOMBIA_SQUAD } from '@/lib/config';
 
 export default function OnboardingPage() {
   const [step, setStep]                  = useState<1 | 2>(1);
@@ -186,16 +186,18 @@ export default function OnboardingPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="golden_glove"
                   required
-                  minLength={2}
-                  maxLength={100}
+                  defaultValue=""
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5
                              focus:border-[#0a4a2e] focus:outline-none transition-colors"
-                  placeholder="Nombre del portero"
-                />
+                >
+                  <option value="">Selecciona un portero...</option>
+                  {WC2026_GOALKEEPERS.map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
               </div>
 
               {/* Best defense */}
@@ -241,16 +243,18 @@ export default function OnboardingPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   ⚽ Goleador de Colombia <span className="text-[#0a4a2e] font-bold">+8 pts</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="colombia_top_scorer"
                   required
-                  minLength={2}
-                  maxLength={100}
+                  defaultValue=""
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5
                              focus:border-[#0a4a2e] focus:outline-none transition-colors"
-                  placeholder="Nombre del jugador"
-                />
+                >
+                  <option value="">Selecciona un jugador...</option>
+                  {WC2026_COLOMBIA_SQUAD.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
               </div>
 
               {error && (

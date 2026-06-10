@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { updateSpecialPicksAction } from '@/features/special-picks/actions';
-import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES } from '@/lib/config';
+import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES, WC2026_GOALKEEPERS, WC2026_COLOMBIA_SQUAD } from '@/lib/config';
 
 interface CurrentPicks {
   champion:    string;
@@ -161,15 +161,16 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
         <label className="block text-sm font-medium text-gray-700 mb-1">
           🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
         </label>
-        <input
-          type="text"
+        <select
           name="golden_glove"
-          minLength={2}
-          maxLength={100}
           defaultValue={initialPicks.golden_glove ?? ''}
           className={inputCls}
-          placeholder="Nombre del portero"
-        />
+        >
+          <option value="">Selecciona un portero...</option>
+          {WC2026_GOALKEEPERS.map((g) => (
+            <option key={g} value={g}>{g}</option>
+          ))}
+        </select>
       </div>
 
       {/* Best defense */}
@@ -211,15 +212,16 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
         <label className="block text-sm font-medium text-gray-700 mb-1">
           ⚽ Goleador de Colombia <span className="text-[#0a4a2e] font-bold">+8 pts</span>
         </label>
-        <input
-          type="text"
+        <select
           name="colombia_top_scorer"
-          minLength={2}
-          maxLength={100}
           defaultValue={initialPicks.colombia_top_scorer ?? ''}
           className={inputCls}
-          placeholder="Nombre del jugador"
-        />
+        >
+          <option value="">Selecciona un jugador...</option>
+          {WC2026_COLOMBIA_SQUAD.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
       </div>
 
       {error && (

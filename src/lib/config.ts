@@ -67,3 +67,69 @@ export const COLOMBIA_ELIMINATION_PHASES = [
 ] as const;
 
 export type ColombiaEliminationPhase = (typeof COLOMBIA_ELIMINATION_PHASES)[number];
+
+export const WC2026_GOALKEEPERS = [
+  // CONMEBOL
+  'Emiliano Martínez (Argentina)', 'Gerónimo Rulli (Argentina)', 'Juan Musso (Argentina)',
+  'Alisson (Brasil)', 'Ederson (Brasil)', 'Weverton (Brasil)',
+  'Camilo Vargas (Colombia)', 'Álvaro Montero (Colombia)', 'David Ospina (Colombia)', 'Devis Vásquez (Colombia)',
+  'Hernán Galíndez (Ecuador)', 'Alexander Domínguez (Ecuador)', 'Carlos Morales (Ecuador)',
+  'Pedro Gallese (Perú)', 'José Carvallo (Perú)',
+  'Sergio Rochet (Uruguay)', 'Guillermo de Amores (Uruguay)',
+  'Wuilker Faríñez (Venezuela)', 'Rafael Romo (Venezuela)',
+  // CONCACAF
+  'Guillermo Ochoa (México)', 'Carlos Acevedo (México)', 'Raúl Rangel (México)',
+  'Chris Brady (USA)', 'Matt Freese (USA)', 'Matt Turner (USA)',
+  'Patrick Pemberton (Costa Rica)', 'Esteban Alvarado (Costa Rica)',
+  'Kevin Chamorro (Panamá)', 'Luis Mejía (Panamá)',
+  'Harold Fonseca (Honduras)', 'Edrick Menjívar (Honduras)',
+  'Andre Blake (Jamaica)', 'Dillon Barnes (Jamaica)',
+  // UEFA
+  'Thibaut Courtois (Bélgica)', 'Senne Lammens (Bélgica)',
+  'Mike Maignan (Francia)', 'Brice Samba (Francia)',
+  'Manuel Neuer (Alemania)', 'Oliver Baumann (Alemania)',
+  'Unai Simón (España)', 'David Raya (España)',
+  'Diogo Costa (Portugal)', 'José Sá (Portugal)',
+  'Jordan Pickford (Inglaterra)', 'Dean Henderson (Inglaterra)',
+  'Gianluigi Donnarumma (Italia)', 'Alex Meret (Italia)',
+  'Dominik Livaković (Croacia)', 'Nediljko Labrović (Croacia)',
+  'Patrick Pentz (Austria)', 'Heinz Lindner (Austria)',
+  'Yann Sommer (Suiza)', 'Yvon Mvogo (Suiza)',
+  'Predrag Rajković (Serbia)', 'Vanja Milinković-Savić (Serbia)',
+  'Péter Gulácsi (Hungría)', 'Dénes Dibusz (Hungría)',
+  'Marek Rodák (Eslovaquia)', 'Martin Dúbravka (Eslovaquia)',
+  'Kasper Schmeichel (Dinamarca)', 'Frederik Rønnow (Dinamarca)',
+  'Mert Günok (Turquía)', 'Altay Bayındır (Turquía)',
+  'Andriy Lunin (Ucrania)', 'Anatolii Trubin (Ucrania)',
+  // CAF
+  'Yassine Bounou (Marruecos)', 'Ahmed Reda Tagnaouti (Marruecos)',
+  'Edouard Mendy (Senegal)', 'Seny Dieng (Senegal)',
+  'Gabaski (Egipto)', 'Mohamed El Shenawy (Egipto)',
+  'Stanley Nwabali (Nigeria)', 'John Noble (Nigeria)',
+  'Ronwen Williams (Sudáfrica)', 'Sipho Chaine (Sudáfrica)',
+  'Yahia Fofana (Argelia)', 'Samir Kadri (Argelia)',
+  'André Onana (Camerún)', 'Simon Ngapandouetnbu (Camerún)',
+  'Aymen Dahmen (Túnez)', 'Bechir Ben Said (Túnez)',
+  'Djigui Diarra (Mali)', 'Ibrahim Mounkoro (Mali)',
+  // AFC
+  'Shuichi Gonda (Japón)', 'Zion Suzuki (Japón)',
+  'Kim Seung-gyu (Corea del Sur)', 'Jo Hyeon-woo (Corea del Sur)',
+  'Alireza Beiranvand (Irán)', 'Hossein Hosseini (Irán)',
+  'Mohammed Al-Owais (Arabia Saudita)', 'Mohammed Al-Rubaie (Arabia Saudita)',
+  'Mat Ryan (Australia)', 'Joe Gauci (Australia)',
+  'Ernando Ari (Indonesia)', 'Cahya Supriadi (Indonesia)',
+  'Wang Dalei (China)', 'Yan Junling (China)',
+  'Eldorbek Sobirov (Uzbekistán)', 'Shohjahon Ergashev (Uzbekistán)',
+  // OFC
+  'Oliver Sail (Nueva Zelanda)', 'Max Crocombe (Nueva Zelanda)',
+] as const;
+
+export const WC2026_COLOMBIA_SQUAD = [
+  'Camilo Vargas', 'Álvaro Montero', 'David Ospina', 'Devis Vásquez',
+  'Daniel Muñoz', 'Santiago Arias', 'Yerry Mina', 'Davinson Sánchez',
+  'Jhon Lucumí', 'Johan Mojica', 'Cristian Borja', 'Óscar Murillo',
+  'James Rodríguez', 'Richard Ríos', 'Jhon Arias', 'Mateus Uribe',
+  'Juan Fernando Quintero', 'Wilmar Barrios', 'Gustavo Puerta',
+  'Luis Díaz', 'Cucho Hernández', 'Rafael Santos Borré',
+  'Jhon Córdoba', 'Dayro Moreno', 'Déiver Machado', 'Carlos Cuesta',
+] as const;
