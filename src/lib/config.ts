@@ -36,7 +36,7 @@ export const WC2026_TEAMS = [
   // CONCACAF (6)
   'United States', 'Mexico', 'Canada', 'Panama', 'Costa Rica', 'Honduras',
   // CONMEBOL (6)
-  'Argentina', 'Brazil', 'Colombia', 'Uruguay', 'Ecuador', 'Venezuela',
+  'Argentina', 'Brazil', 'Colombia', 'Uruguay', 'Ecuador', 'Paraguay',
   // UEFA (16)
   'Germany', 'Spain', 'France', 'England', 'Portugal', 'Netherlands',
   'Belgium', 'Italy', 'Croatia', 'Austria', 'Switzerland', 'Serbia',
@@ -44,9 +44,9 @@ export const WC2026_TEAMS = [
   // CAF (9)
   'Morocco', 'Senegal', 'Egypt', 'Nigeria', 'South Africa',
   'Algeria', 'Cameroon', 'Tunisia', 'Mali',
-  // AFC (8)
-  'Japan', 'South Korea', 'Iran', 'Saudi Arabia',
-  'Australia', 'Indonesia', 'China', 'Uzbekistan',
+  // AFC (9)
+  'Japan', 'South Korea', 'Iran', 'Australia', 'Uzbekistan',
+  'Jordan', 'Iraq', 'Saudi Arabia', 'Qatar',
   // OFC (1)
   'New Zealand',
   // Playoff spots (2)
@@ -113,8 +113,6 @@ export const WC2026_GOALKEEPERS = [
   'Johny Placide (Haití)', 'Alexandre Pierre (Haití)', 'Josue Duverger (Haití)',
   // Honduras
   'Harold Fonseca (Honduras)', 'Edrick Menjívar (Honduras)', 'Kevin Caballero (Honduras)',
-  // Indonesia
-  'Ernando Ari (Indonesia)', 'Cahya Supriadi (Indonesia)', 'Syahrul Trisna (Indonesia)',
   // Iran
   'Alireza Beiranvand (Irán)', 'Seyed Hossein Hosseini (Irán)', 'Payam Niazmand (Irán)',
   // Iraq
@@ -165,6 +163,8 @@ export const WC2026_GOALKEEPERS = [
   'Sergio Rochet (Uruguay)', 'Guillermo de Amores (Uruguay)', 'Santiago Mele (Uruguay)',
   // Uzbekistan
   'Eldorbek Sobirov (Uzbekistán)', 'Shohjahon Ergashev (Uzbekistán)', 'Alisher Umarov (Uzbekistán)',
+  // Qatar
+  'Meshaal Barsham (Catar)', 'Yousef Hassan (Catar)', 'Ibrahim Al Ghanim (Catar)',
 ] as const;
 
 export const WC2026_COLOMBIA_SQUAD = [
