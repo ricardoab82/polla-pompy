@@ -214,14 +214,18 @@ export async function gradeSpecialPicksAction(formData: FormData) {
   const { error, supabase } = await requireAdmin();
   if (error || !supabase) return { error };
 
-  const champion    = (formData.get('champion') as string).trim();
-  const runnerUp    = (formData.get('runner_up') as string).trim();
-  const topScorer   = (formData.get('top_scorer') as string).trim();
-  const goldenBall  = (formData.get('golden_ball') as string).trim();
+  const champion               = (formData.get('champion') as string).trim();
+  const runnerUp               = (formData.get('runner_up') as string).trim();
+  const topScorer              = (formData.get('top_scorer') as string).trim();
+  const goldenBall             = (formData.get('golden_ball') as string).trim();
+  const goldenGlove            = (formData.get('golden_glove') as string).trim();
+  const bestDefense            = (formData.get('best_defense') as string).trim();
+  const colombiaEliminated     = (formData.get('colombia_eliminated_phase') as string).trim();
+  const colombiaTopScorer      = (formData.get('colombia_top_scorer') as string).trim();
 
   const { data: allSpecialPicks } = await supabase
     .from('special_picks')
-    .select('id, champion, runner_up, top_scorer, golden_ball');
+    .select('id, champion, runner_up, top_scorer, golden_ball, golden_glove, best_defense, colombia_eliminated_phase, colombia_top_scorer');
 
   if (!allSpecialPicks) return { error: 'No special picks found' };
 
@@ -230,10 +234,14 @@ export async function gradeSpecialPicksAction(formData: FormData) {
     const { error: updateErr } = await supabase
       .from('special_picks')
       .update({
-        champion_pts:    sp.champion    === champion   ? 20 : 0,
-        runner_up_pts:   sp.runner_up   === runnerUp   ? 10 : 0,
-        top_scorer_pts:  sp.top_scorer  === topScorer  ? 10 : 0,
-        golden_ball_pts: sp.golden_ball === goldenBall ?  5 : 0,
+        champion_pts:            sp.champion                    === champion           ? 20 : 0,
+        runner_up_pts:           sp.runner_up                   === runnerUp           ? 10 : 0,
+        top_scorer_pts:          sp.top_scorer                  === topScorer          ? 10 : 0,
+        golden_ball_pts:         sp.golden_ball                 === goldenBall         ?  5 : 0,
+        golden_glove_pts:        goldenGlove && sp.golden_glove              === goldenGlove        ?  5 : 0,
+        best_defense_pts:        bestDefense && sp.best_defense              === bestDefense        ?  5 : 0,
+        colombia_eliminated_pts: colombiaEliminated && sp.colombia_eliminated_phase === colombiaEliminated ? 10 : 0,
+        colombia_top_scorer_pts: colombiaTopScorer && sp.colombia_top_scorer          === colombiaTopScorer ?  8 : 0,
       })
       .eq('id', sp.id);
 

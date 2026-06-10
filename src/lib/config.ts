@@ -54,3 +54,16 @@ export const WC2026_TEAMS = [
 ] as const;
 
 export type WC2026Team = (typeof WC2026_TEAMS)[number];
+
+// Phases for Colombia elimination pick
+export const COLOMBIA_ELIMINATION_PHASES = [
+  'Fase de grupos',
+  'Ronda de 32',
+  'Ronda de 16',
+  'Cuartos de final',
+  'Semifinales',
+  'Final',
+  'Campeón',
+] as const;
+
+export type ColombiaEliminationPhase = (typeof COLOMBIA_ELIMINATION_PHASES)[number];

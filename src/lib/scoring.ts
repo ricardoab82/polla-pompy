@@ -71,10 +71,14 @@ export function calculatePoints(
 
 // Special picks points values (graded manually by admin)
 export const SPECIAL_PICK_POINTS = {
-  champion:   20,
-  runner_up:  10,
-  top_scorer: 10,
-  golden_ball: 5,
+  champion:                  20,
+  runner_up:                 10,
+  top_scorer:                10,
+  golden_ball:                5,
+  golden_glove:               5,
+  best_defense:               5,
+  colombia_eliminated_phase: 10,
+  colombia_top_scorer:        8,
 } as const;
 
 export type SpecialPickType = keyof typeof SPECIAL_PICK_POINTS;

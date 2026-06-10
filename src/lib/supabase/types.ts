@@ -66,12 +66,20 @@ export interface SpecialPickRow {
   runner_up:        string;
   top_scorer:       string;
   golden_ball:      string;
-  submitted_at:     string;
-  champion_pts:     number | null;
-  runner_up_pts:    number | null;
-  top_scorer_pts:   number | null;
-  golden_ball_pts:  number | null;
-  total_special_pts: number;
+  golden_glove:              string | null;
+  best_defense:              string | null;
+  colombia_eliminated_phase: string | null;
+  colombia_top_scorer:       string | null;
+  submitted_at:              string;
+  champion_pts:              number | null;
+  runner_up_pts:             number | null;
+  top_scorer_pts:            number | null;
+  golden_ball_pts:           number | null;
+  golden_glove_pts:          number | null;
+  best_defense_pts:          number | null;
+  colombia_eliminated_pts:   number | null;
+  colombia_top_scorer_pts:   number | null;
+  total_special_pts:         number;
 }
 
 export interface BonusQuestionRow {
@@ -151,7 +159,7 @@ export interface Database {
       };
       special_picks: {
         Row:    SpecialPickRow;
-        Insert: Omit<SpecialPickRow, 'id' | 'submitted_at' | 'champion_pts' | 'runner_up_pts' | 'top_scorer_pts' | 'golden_ball_pts' | 'total_special_pts'>
+        Insert: Omit<SpecialPickRow, 'id' | 'submitted_at' | 'champion_pts' | 'runner_up_pts' | 'top_scorer_pts' | 'golden_ball_pts' | 'golden_glove_pts' | 'best_defense_pts' | 'colombia_eliminated_pts' | 'colombia_top_scorer_pts' | 'total_special_pts'>
                 & { id?: string; submitted_at?: string };
         Update: Partial<Omit<SpecialPickRow, 'id' | 'submitted_at' | 'total_special_pts'> & { id?: string; submitted_at?: string }>;
       };

@@ -22,17 +22,20 @@ export default async function AdminSpecialPicksPage() {
         <form action={formAction(gradeSpecialPicksAction)} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              { name: 'champion',    label: '🏆 Campeón (+20 pts)' },
-              { name: 'runner_up',   label: '🥈 Subcampeón (+10 pts)' },
-              { name: 'top_scorer',  label: '👟 Goleador (+10 pts)' },
-              { name: 'golden_ball', label: '⭐ Balón de Oro (+5 pts)' },
+              { name: 'champion',                  label: '🏆 Campeón (+20 pts)',              type: 'text' },
+              { name: 'runner_up',                 label: '🥈 Subcampeón (+10 pts)',            type: 'text' },
+              { name: 'top_scorer',                label: '👟 Goleador (+10 pts)',              type: 'text' },
+              { name: 'golden_ball',               label: '⭐ Balón de Oro (+5 pts)',           type: 'text' },
+              { name: 'golden_glove',              label: '🧤 Guante de Oro (+5 pts)',          type: 'text' },
+              { name: 'best_defense',              label: '🛡️ Menos goles en contra (+5 pts)', type: 'text' },
+              { name: 'colombia_eliminated_phase', label: '🇨🇴 Fase eliminación Colombia (+10 pts)', type: 'text' },
+              { name: 'colombia_top_scorer',       label: '⚽ Goleador Colombia (+8 pts)',      type: 'text' },
             ].map((field) => (
               <div key={field.name}>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{field.label}</label>
                 <input
                   type="text"
                   name={field.name}
-                  required
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm
                              focus:border-[#0a4a2e] focus:outline-none"
                   placeholder="Nombre exacto..."
@@ -56,6 +59,10 @@ export default async function AdminSpecialPicksPage() {
               <th className="py-2 px-2 text-left hidden md:table-cell">Subcampeón</th>
               <th className="py-2 px-2 text-left hidden lg:table-cell">Goleador</th>
               <th className="py-2 px-2 text-left hidden lg:table-cell">Balón de Oro</th>
+              <th className="py-2 px-2 text-left hidden xl:table-cell">Guante de Oro</th>
+              <th className="py-2 px-2 text-left hidden xl:table-cell">Menos goles</th>
+              <th className="py-2 px-2 text-left hidden xl:table-cell">Elim. Colombia</th>
+              <th className="py-2 px-2 text-left hidden xl:table-cell">Goleador Col.</th>
               <th className="py-2 px-2 text-right">Total pts</th>
             </tr>
           </thead>
@@ -76,6 +83,10 @@ export default async function AdminSpecialPicksPage() {
                   <td className="py-3 px-2 hidden md:table-cell">{sp.runner_up}</td>
                   <td className="py-3 px-2 hidden lg:table-cell">{sp.top_scorer}</td>
                   <td className="py-3 px-2 hidden lg:table-cell">{sp.golden_ball}</td>
+                  <td className="py-3 px-2 hidden xl:table-cell">{sp.golden_glove ?? '—'}</td>
+                  <td className="py-3 px-2 hidden xl:table-cell">{sp.best_defense ?? '—'}</td>
+                  <td className="py-3 px-2 hidden xl:table-cell">{sp.colombia_eliminated_phase ?? '—'}</td>
+                  <td className="py-3 px-2 hidden xl:table-cell">{sp.colombia_top_scorer ?? '—'}</td>
                   <td className="py-3 px-2 text-right font-bold text-[#0a4a2e]">
                     {sp.total_special_pts}
                   </td>

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { submitSpecialPicksAction, updateDisplayNameAction } from '@/features/special-picks/actions';
-import { WC2026_TEAMS } from '@/lib/config';
+import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES } from '@/lib/config';
 
 export default function OnboardingPage() {
   const [step, setStep]                  = useState<1 | 2>(1);
@@ -172,6 +172,78 @@ export default function OnboardingPage() {
                 <input
                   type="text"
                   name="golden_ball"
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
+                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
+                  placeholder="Nombre del jugador"
+                />
+              </div>
+
+              {/* Golden glove */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+                </label>
+                <input
+                  type="text"
+                  name="golden_glove"
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
+                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
+                  placeholder="Nombre del portero"
+                />
+              </div>
+
+              {/* Best defense */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  🛡️ Menos goles en contra <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+                </label>
+                <select
+                  name="best_defense"
+                  required
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
+                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
+                  defaultValue=""
+                >
+                  <option value="">Selecciona un equipo...</option>
+                  {WC2026_TEAMS.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Colombia elimination phase */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  🇨🇴 Fase eliminación Colombia <span className="text-[#0a4a2e] font-bold">+10 pts</span>
+                </label>
+                <select
+                  name="colombia_eliminated_phase"
+                  required
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5
+                             focus:border-[#0a4a2e] focus:outline-none transition-colors"
+                  defaultValue=""
+                >
+                  <option value="">Selecciona una fase...</option>
+                  {COLOMBIA_ELIMINATION_PHASES.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Colombia top scorer */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ⚽ Goleador de Colombia <span className="text-[#0a4a2e] font-bold">+8 pts</span>
+                </label>
+                <input
+                  type="text"
+                  name="colombia_top_scorer"
                   required
                   minLength={2}
                   maxLength={100}

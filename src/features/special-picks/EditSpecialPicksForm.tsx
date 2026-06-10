@@ -2,13 +2,17 @@
 
 import { useState, useTransition } from 'react';
 import { updateSpecialPicksAction } from '@/features/special-picks/actions';
-import { WC2026_TEAMS } from '@/lib/config';
+import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES } from '@/lib/config';
 
 interface CurrentPicks {
   champion:    string;
   runner_up:   string;
   top_scorer:  string;
   golden_ball: string;
+  golden_glove:              string | null;
+  best_defense:              string | null;
+  colombia_eliminated_phase: string | null;
+  colombia_top_scorer:       string | null;
 }
 
 export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: CurrentPicks }) {
@@ -48,6 +52,8 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
     setChampion(initialPicks.champion);
     setRunnerUp(initialPicks.runner_up);
   }
+
+  const inputCls = 'w-full border border-gray-200 rounded-lg px-3 py-2.5 focus:border-[#0a4a2e] focus:outline-none transition-colors';
 
   if (!isEditing) {
     return (
@@ -145,8 +151,73 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
           minLength={2}
           maxLength={100}
           defaultValue={initialPicks.golden_ball}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2.5
-                     focus:border-[#0a4a2e] focus:outline-none transition-colors"
+          className={inputCls}
+          placeholder="Nombre del jugador"
+        />
+      </div>
+
+      {/* Golden glove */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+        </label>
+        <input
+          type="text"
+          name="golden_glove"
+          minLength={2}
+          maxLength={100}
+          defaultValue={initialPicks.golden_glove ?? ''}
+          className={inputCls}
+          placeholder="Nombre del portero"
+        />
+      </div>
+
+      {/* Best defense */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          🛡️ Menos goles en contra <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+        </label>
+        <select
+          name="best_defense"
+          defaultValue={initialPicks.best_defense ?? ''}
+          className={inputCls}
+        >
+          <option value="">Selecciona un equipo...</option>
+          {WC2026_TEAMS.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Colombia elimination phase */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          🇨🇴 Fase eliminación Colombia <span className="text-[#0a4a2e] font-bold">+10 pts</span>
+        </label>
+        <select
+          name="colombia_eliminated_phase"
+          defaultValue={initialPicks.colombia_eliminated_phase ?? ''}
+          className={inputCls}
+        >
+          <option value="">Selecciona una fase...</option>
+          {COLOMBIA_ELIMINATION_PHASES.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Colombia top scorer */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          ⚽ Goleador de Colombia <span className="text-[#0a4a2e] font-bold">+8 pts</span>
+        </label>
+        <input
+          type="text"
+          name="colombia_top_scorer"
+          minLength={2}
+          maxLength={100}
+          defaultValue={initialPicks.colombia_top_scorer ?? ''}
+          className={inputCls}
           placeholder="Nombre del jugador"
         />
       </div>
