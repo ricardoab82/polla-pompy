@@ -34,23 +34,21 @@ export const COLOMBIA_TEAM_NAME = 'Colombia';
 // Confirmed 48 qualified teams for FIFA World Cup 2026
 export const WC2026_TEAMS = [
   // CONCACAF (6)
-  'United States', 'Mexico', 'Canada', 'Panama', 'Costa Rica', 'Honduras',
+  'United States', 'Mexico', 'Canada', 'Panama', 'Curaçao', 'Haiti',
   // CONMEBOL (6)
   'Argentina', 'Brazil', 'Colombia', 'Uruguay', 'Ecuador', 'Paraguay',
   // UEFA (16)
-  'Germany', 'Spain', 'France', 'England', 'Portugal', 'Netherlands',
-  'Belgium', 'Italy', 'Croatia', 'Austria', 'Switzerland', 'Serbia',
-  'Hungary', 'Slovakia', 'Denmark', 'Turkey',
-  // CAF (9)
-  'Morocco', 'Senegal', 'Egypt', 'Nigeria', 'South Africa',
-  'Algeria', 'Cameroon', 'Tunisia', 'Mali',
+  'England', 'France', 'Spain', 'Germany', 'Portugal', 'Netherlands',
+  'Belgium', 'Croatia', 'Switzerland', 'Austria', 'Scotland', 'Norway',
+  'Bosnia and Herzegovina', 'Sweden', 'Turkey', 'Czech Republic',
+  // CAF (10)
+  'Morocco', 'Senegal', 'Egypt', 'Algeria', 'Tunisia',
+  'South Africa', 'Ivory Coast', 'Ghana', 'Cape Verde', 'DR Congo',
   // AFC (9)
-  'Japan', 'South Korea', 'Iran', 'Australia', 'Uzbekistan',
-  'Jordan', 'Iraq', 'Saudi Arabia', 'Qatar',
+  'Japan', 'Iran', 'South Korea', 'Australia', 'Saudi Arabia',
+  'Qatar', 'Uzbekistan', 'Jordan', 'Iraq',
   // OFC (1)
   'New Zealand',
-  // Playoff spots (2)
-  'Playoff 1 (TBD)', 'Playoff 2 (TBD)',
 ] as const;
 
 export type WC2026Team = (typeof WC2026_TEAMS)[number];
@@ -77,7 +75,7 @@ export const WC2026_GOALKEEPERS = [
   'Patrick Pentz (Austria)', 'Alexander Schlager (Austria)', 'Florian Wiegele (Austria)',
   // Belgium
   'Thibaut Courtois (Bélgica)', 'Senne Lammens (Bélgica)', 'Mike Penders (Bélgica)',
-  // Bosnia
+  // Bosnia and Herzegovina
   'Nikola Vasilj (Bosnia)', 'Martin Zlomislic (Bosnia)', 'Osman Hadzikic (Bosnia)',
   // Brazil
   'Alisson (Brasil)', 'Ederson (Brasil)', 'Weverton (Brasil)',
@@ -87,13 +85,11 @@ export const WC2026_GOALKEEPERS = [
   'Vozinha (Cabo Verde)', 'Marcio Rosa (Cabo Verde)', 'CJ dos Santos (Cabo Verde)',
   // Colombia
   'Camilo Vargas (Colombia)', 'Álvaro Montero (Colombia)', 'David Ospina (Colombia)',
-  // Costa Rica
-  'Patrick Pemberton (Costa Rica)', 'Esteban Alvarado (Costa Rica)', 'Aaron Cruz (Costa Rica)',
   // Croatia
   'Dominik Livaković (Croacia)', 'Dominik Kotarski (Croacia)', 'Ivor Pandur (Croacia)',
-  // Curacao
+  // Curaçao
   'Eloy Room (Curazao)', 'Tyrick Bodack (Curazao)', 'Trevor Doornbusch (Curazao)',
-  // Czechia
+  // Czech Republic
   'Jindřich Staněk (Chequia)', 'Matěj Kovář (Chequia)', 'Lukáš Horníček (Chequia)',
   // DR Congo
   'Matthieu Epolo (R.D. Congo)', 'Timothy Fayulu (R.D. Congo)', 'Lionel Mpasi (R.D. Congo)',
@@ -111,16 +107,12 @@ export const WC2026_GOALKEEPERS = [
   'Lawrence Ati-Zigi (Ghana)', 'Joseph Anang (Ghana)', 'Benjamin Asare (Ghana)',
   // Haiti
   'Johny Placide (Haití)', 'Alexandre Pierre (Haití)', 'Josue Duverger (Haití)',
-  // Honduras
-  'Harold Fonseca (Honduras)', 'Edrick Menjívar (Honduras)', 'Kevin Caballero (Honduras)',
   // Iran
   'Alireza Beiranvand (Irán)', 'Seyed Hossein Hosseini (Irán)', 'Payam Niazmand (Irán)',
   // Iraq
   'Fahad Talib (Irak)', 'Jalal Hassan (Irak)', 'Ahmed Basil (Irak)',
   // Ivory Coast
   'Yahia Fofana (Costa de Marfil)', 'Alban Lafont (Costa de Marfil)', 'Mohamed Kone (Costa de Marfil)',
-  // Jamaica
-  'Andre Blake (Jamaica)', 'Dillon Barnes (Jamaica)', 'Jahmali Waite (Jamaica)',
   // Japan
   'Zion Suzuki (Japón)', 'Keisuke Osako (Japón)', 'Tomoki Hayakawa (Japón)',
   // Jordan
@@ -133,38 +125,40 @@ export const WC2026_GOALKEEPERS = [
   'Bart Verbruggen (Países Bajos)', 'Mark Flekken (Países Bajos)', 'Robin Roefs (Países Bajos)',
   // New Zealand
   'Max Crocombe (Nueva Zelanda)', 'Michael Woud (Nueva Zelanda)', 'Alex Paulsen (Nueva Zelanda)',
+  // Norway
+  'Ørjan Nyland (Noruega)', 'Jørgen Strand Larsen (Noruega)', 'Markus Henriksen (Noruega)',
   // Panama
   'Kevin Chamorro (Panamá)', 'Luis Mejía (Panamá)', 'Orlando Mosquera (Panamá)',
+  // Paraguay
+  'Anthony Silva (Paraguay)', 'Alfredo Aguilar (Paraguay)', 'Rodrigo Muñoz (Paraguay)',
   // Portugal
   'Diogo Costa (Portugal)', 'José Sá (Portugal)', 'Rui Patrício (Portugal)',
+  // Qatar
+  'Meshaal Barsham (Catar)', 'Yousef Hassan (Catar)', 'Ibrahim Al-Ghanim (Catar)',
   // Saudi Arabia
   'Mohammed Al-Owais (Arabia Saudita)', 'Mohammed Al-Rubaie (Arabia Saudita)', 'Fawaz Al-Qarni (Arabia Saudita)',
+  // Scotland
+  'Angus Gunn (Escocia)', 'Craig Gordon (Escocia)', 'Liam Kelly (Escocia)',
   // Senegal
   'Edouard Mendy (Senegal)', 'Seny Dieng (Senegal)', 'Boubacar Fall (Senegal)',
-  // Serbia
-  'Predrag Rajković (Serbia)', 'Vanja Milinković-Savić (Serbia)', 'Nikola Milovanović (Serbia)',
-  // Slovakia
-  'Marek Rodák (Eslovaquia)', 'Martin Dúbravka (Eslovaquia)', 'Henrich Ravas (Eslovaquia)',
   // South Africa
   'Ronwen Williams (Sudáfrica)', 'Ricardo Goss (Sudáfrica)', 'Sipho Chaine (Sudáfrica)',
   // South Korea
   'Kim Seung-gyu (Corea del Sur)', 'Jo Hyeon-woo (Corea del Sur)', 'Song Bum-keun (Corea del Sur)',
   // Spain
   'Unai Simón (España)', 'David Raya (España)', 'Álex Remiro (España)',
+  // Sweden
+  'Robin Olsen (Suecia)', 'Karl-Johan Johnsson (Suecia)', 'Samuel Brolin (Suecia)',
   // Switzerland
   'Yann Sommer (Suiza)', 'Yvon Mvogo (Suiza)', 'Jonas Omlin (Suiza)',
   // Turkey
   'Mert Günok (Turquía)', 'Altay Bayındır (Turquía)', 'Berke Özer (Turquía)',
-  // Ukraine
-  'Andriy Lunin (Ucrania)', 'Anatolii Trubin (Ucrania)', 'Georgiy Bushchan (Ucrania)',
   // United States
   'Chris Brady (Estados Unidos)', 'Matt Freese (Estados Unidos)', 'Matt Turner (Estados Unidos)',
   // Uruguay
   'Sergio Rochet (Uruguay)', 'Guillermo de Amores (Uruguay)', 'Santiago Mele (Uruguay)',
   // Uzbekistan
   'Eldorbek Sobirov (Uzbekistán)', 'Shohjahon Ergashev (Uzbekistán)', 'Alisher Umarov (Uzbekistán)',
-  // Qatar
-  'Meshaal Barsham (Catar)', 'Yousef Hassan (Catar)', 'Ibrahim Al Ghanim (Catar)',
 ] as const;
 
 export const WC2026_COLOMBIA_SQUAD = [
