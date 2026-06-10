@@ -75,7 +75,7 @@ export const SPECIAL_PICK_POINTS = {
   runner_up:                 10,
   top_scorer:                10,
   golden_ball:                5,
-  golden_glove:               5,
+  fourth_place:               5,
   best_defense:               5,
   colombia_eliminated_phase: 10,
   colombia_top_scorer:        8,

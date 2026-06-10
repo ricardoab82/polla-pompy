@@ -2,14 +2,14 @@
 
 import { useState, useTransition } from 'react';
 import { updateSpecialPicksAction } from '@/features/special-picks/actions';
-import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES, WC2026_GOALKEEPERS, WC2026_COLOMBIA_SQUAD } from '@/lib/config';
+import { WC2026_TEAMS, COLOMBIA_ELIMINATION_PHASES, WC2026_COLOMBIA_SQUAD } from '@/lib/config';
 
 interface CurrentPicks {
   champion:    string;
   runner_up:   string;
   top_scorer:  string;
   golden_ball: string;
-  golden_glove:              string | null;
+  fourth_place:              string | null;
   best_defense:              string | null;
   colombia_eliminated_phase: string | null;
   colombia_top_scorer:       string | null;
@@ -156,19 +156,19 @@ export default function EditSpecialPicksForm({ initialPicks }: { initialPicks: C
         />
       </div>
 
-      {/* Golden glove */}
+      {/* Fourth place */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          🧤 Guante de Oro <span className="text-[#0a4a2e] font-bold">+5 pts</span>
+          🥉 Cuarto puesto <span className="text-[#0a4a2e] font-bold">+5 pts</span>
         </label>
         <select
-          name="golden_glove"
-          defaultValue={initialPicks.golden_glove ?? ''}
+          name="fourth_place"
+          defaultValue={initialPicks.fourth_place ?? ''}
           className={inputCls}
         >
-          <option value="">Selecciona un portero...</option>
-          {WC2026_GOALKEEPERS.map((g) => (
-            <option key={g} value={g}>{g}</option>
+          <option value="">Selecciona un equipo...</option>
+          {WC2026_TEAMS.map((t) => (
+            <option key={t} value={t}>{t}</option>
           ))}
         </select>
       </div>

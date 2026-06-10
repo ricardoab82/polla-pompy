@@ -22,7 +22,7 @@ export const SpecialPicksSchema = z.object({
   runner_up:                 z.string().min(2),
   top_scorer:                z.string().min(2).max(100),
   golden_ball:               z.string().min(2).max(100),
-  golden_glove:              z.string().min(2).max(100).optional(),
+  fourth_place:              z.string().min(2).optional(),
   best_defense:              z.string().min(2).optional(),
   colombia_eliminated_phase: z.string().min(2).optional(),
   colombia_top_scorer:       z.string().min(2).max(100).optional(),
