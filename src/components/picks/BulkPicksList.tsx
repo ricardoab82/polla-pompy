@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { submitBulkPicksAction } from '@/features/picks/actions';
 import { PICK_LOCK_MINUTES } from '@/lib/config';
+import Countdown from '@/components/ui/Countdown';
 
 interface Match {
   id: string;
@@ -179,6 +180,13 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                       {/* Centre */}
                       <div className="flex-1 flex flex-col items-center gap-1">
                         <p className="text-xs text-gray-400">{formatKickoff(match.kickoff_utc)}</p>
+                        {!isLocked && !isFinished && !isLive && (
+                          <Countdown
+                            targetDate={lockTime.toISOString()}
+                            label="Cierra en"
+                            className="text-xs text-gray-400 flex flex-col items-center"
+                          />
+                        )}
 
                         {isFinished && match.home_score !== null ? (
                           <div className="flex flex-col items-center gap-0.5">
@@ -198,7 +206,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                           </div>
                         ) : isLocked ? (
                           <div className="flex flex-col items-center gap-0.5">
-                            <span className="text-xs text-red-500 font-medium">Cerrado</span>
+                            <span className="text-xs text-red-500 font-medium">🔒 Cerrado</span>
                             {existingPick && (
                               <span className="font-display text-lg text-gray-600">
                                 {existingPick.home_pick}–{existingPick.away_pick}

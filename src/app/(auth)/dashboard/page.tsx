@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Countdown from '@/components/ui/Countdown';
 import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
-import { FEATURES } from '@/lib/config';
+import { FEATURES, PICK_LOCK_MINUTES } from '@/lib/config';
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -128,8 +128,8 @@ export default async function DashboardPage() {
                 </Link>
               )}
               <Countdown
-                targetDate={new Date(new Date(nextMatch.kickoff_utc).getTime() - 60 * 60 * 1000).toISOString()}
-                label="Cierra en"
+                targetDate={new Date(new Date(nextMatch.kickoff_utc).getTime() - PICK_LOCK_MINUTES * 60 * 1000).toISOString()}
+                label="Picks cierran en"
                 className="text-sm text-gray-500 items-center text-center justify-center"
               />
             </div>
