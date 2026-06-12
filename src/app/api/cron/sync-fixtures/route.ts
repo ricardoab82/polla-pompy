@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { syncAllFixtures } from '@/lib/api-football';
+import { syncFinishedMatches } from '@/lib/football-data';
 
 function verifyCronSecret(req: Request): boolean {
   const auth = req.headers.get('Authorization');
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  console.log('[cron/sync-fixtures] Starting full fixture sync...');
+  console.log('[cron/sync-fixtures] Starting finished-match sync via football-data.org...');
   const dryRun = process.env.CRON_DRY_RUN === 'true';
 
   if (dryRun) {
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ dry_run: true });
   }
 
-  const { synced, errors } = await syncAllFixtures();
+  const { synced, errors } = await syncFinishedMatches();
 
   console.log(`[cron/sync-fixtures] Done. Synced: ${synced}, Errors: ${errors.length}`);
   if (errors.length) console.error('[cron/sync-fixtures] Errors:', errors);
