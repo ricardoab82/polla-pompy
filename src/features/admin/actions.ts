@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { BonusQuestionSchema } from '@/lib/schemas';
 import { calculateMatchPoints, gradeBonusAnswers } from '@/lib/points-engine';
 import { revalidatePath } from 'next/cache';
@@ -162,13 +162,14 @@ export async function deleteBonusQuestionAction(formData: FormData) {
 // ── User management ─────────────────────────────────────────
 
 export async function toggleUserActiveAction(formData: FormData) {
-  const { error, supabase } = await requireAdmin();
-  if (error || !supabase) return { error };
+  const { error } = await requireAdmin();
+  if (error) return { error };
 
   const userId   = formData.get('user_id') as string;
   const isActive = formData.get('is_active') === 'true';
 
-  const { error: updateErr } = await supabase
+  // Use service client — users_update_own RLS blocks admin from updating other rows
+  const { error: updateErr } = await createServiceClient()
     .from('users')
     .update({ is_active: !isActive })
     .eq('id', userId);
@@ -201,7 +202,8 @@ export async function assignCoAdminAction(formData: FormData) {
     return { error: 'Rol inválido' };
   }
 
-  const { error: updateErr } = await supabase
+  // Use service client — users_update_own RLS blocks admin from updating other rows
+  const { error: updateErr } = await createServiceClient()
     .from('users')
     .update({ role: newRole })
     .eq('id', targetUserId)
