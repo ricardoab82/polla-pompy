@@ -54,8 +54,17 @@ export default async function AdminMatchesPage() {
 
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Manual result override */}
-                <form action={formAction(updateMatchResultAction)} className="flex items-center gap-1">
+                <form action={formAction(updateMatchResultAction)} className="flex items-center gap-1 flex-wrap">
                   <input type="hidden" name="match_id" value={match.id} />
+                  <select
+                    name="match_status"
+                    defaultValue={match.status === 'cancelled' ? 'finished' : match.status}
+                    className="h-8 text-xs border border-gray-200 rounded px-1 text-gray-700"
+                  >
+                    <option value="scheduled">📅 Programado</option>
+                    <option value="live">🔴 En vivo</option>
+                    <option value="finished">✅ Finalizado</option>
+                  </select>
                   <input
                     type="number" name="home_score" min="0" max="20"
                     defaultValue={match.home_score ?? ''}

@@ -29,16 +29,21 @@ export async function updateMatchResultAction(formData: FormData) {
   const { error, supabase } = await requireAdmin();
   if (error || !supabase) return { error };
 
-  const matchId   = formData.get('match_id') as string;
-  const homeScore = Number(formData.get('home_score'));
-  const awayScore = Number(formData.get('away_score'));
+  const matchId    = formData.get('match_id') as string;
+  const homeScore  = Number(formData.get('home_score'));
+  const awayScore  = Number(formData.get('away_score'));
+  const rawStatus  = formData.get('match_status') as string;
+  const validStatuses = ['scheduled', 'live', 'finished'] as const;
+  const status = validStatuses.includes(rawStatus as typeof validStatuses[number])
+    ? (rawStatus as typeof validStatuses[number])
+    : 'finished';
 
   const { error: updateErr } = await supabase
     .from('matches')
     .update({
       home_score: homeScore,
       away_score: awayScore,
-      status:     'finished',
+      status,
       updated_at: new Date().toISOString(),
     })
     .eq('id', matchId);

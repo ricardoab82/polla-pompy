@@ -65,12 +65,20 @@ export default async function MatchDetailPage({
         .in('question_id', questions.map((q) => q.id))
     : { data: null };
 
-  // Sort picks: my pick first, then by points desc
-  const sortedPicks = [...(picks ?? [])].sort((a, b) => {
-    if (a.user_id === user.id) return -1;
-    if (b.user_id === user.id) return 1;
-    return (b.points_earned ?? -1) - (a.points_earned ?? -1);
-  });
+  // Sort picks by points desc for ranking; my pick highlighted but not forced first
+  const sortedPicks = [...(picks ?? [])].sort(
+    (a, b) => (b.points_earned ?? -1) - (a.points_earned ?? -1),
+  );
+
+  // Compute rank (tied picks share same rank)
+  const rankMap = new Map<string, number>();
+  let rank = 1;
+  for (let i = 0; i < sortedPicks.length; i++) {
+    if (i > 0 && sortedPicks[i].points_earned !== sortedPicks[i - 1].points_earned) {
+      rank = i + 1;
+    }
+    rankMap.set(sortedPicks[i].user_id, rank);
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
@@ -124,13 +132,14 @@ export default async function MatchDetailPage({
             {sortedPicks
               .filter((p) => isPostKickoff || p.user_id === user.id)
               .map((pick) => {
-                const u         = userMap.get(pick.user_id);
-                const isMe      = pick.user_id === user.id;
-                const ptColor   = pick.points_earned == null ? '' :
-                                  pick.points_earned > 0 ? 'text-green-600' : 'text-red-500';
-                const isExact   = match.home_score !== null &&
-                                  pick.home_pick === match.home_score &&
-                                  pick.away_pick === match.away_score;
+                const u       = userMap.get(pick.user_id);
+                const isMe    = pick.user_id === user.id;
+                const ptColor = pick.points_earned == null ? '' :
+                                pick.points_earned > 0 ? 'text-green-600' : 'text-red-500';
+                const isExact = match.home_score !== null &&
+                                pick.home_pick === match.home_score &&
+                                pick.away_pick === match.away_score;
+                const pickRank = rankMap.get(pick.user_id);
 
                 return (
                   <div
@@ -139,6 +148,11 @@ export default async function MatchDetailPage({
                                 ${isMe ? 'bg-[#e8f5e9] -mx-4 px-4 rounded-lg' : ''}`}
                   >
                     <div className="flex items-center gap-2">
+                      {isPostKickoff && (
+                        <span className="text-xs font-bold text-gray-400 w-5 text-right">
+                          {pickRank}
+                        </span>
+                      )}
                       {u && <Avatar displayName={u.display_name} avatarUrl={u.avatar_url} size={28} />}
                       <span className="text-sm font-medium">
                         {u?.display_name ?? '—'}
