@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Countdown from '@/components/ui/Countdown';
 import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
 import { FEATURES, PICK_LOCK_MINUTES } from '@/lib/config';
+import AutoRefresh from '@/components/ui/AutoRefresh';
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -57,6 +58,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <AutoRefresh />
       {/* My position card */}
       <div className="card bg-[#0a4a2e] text-white border-0">
         <div className="flex items-center justify-between">

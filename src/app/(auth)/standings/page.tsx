@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
 import ProgressionChart, { type ChartDataPoint } from '@/components/standings/ProgressionChart';
 import { FEATURES } from '@/lib/config';
+import AutoRefresh from '@/components/ui/AutoRefresh';
 
 export default async function StandingsPage() {
   const supabase = createClient();
@@ -39,6 +40,7 @@ export default async function StandingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <AutoRefresh />
       <h1 className="font-display text-4xl text-[#0a4a2e]">Posiciones</h1>
 
       <div className="card">
