@@ -188,13 +188,18 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                           />
                         )}
 
-                        {isFinished && match.home_score !== null ? (
+                        {isFinished ? (
                           <div className="flex flex-col items-center gap-0.5">
-                            <span className="font-display text-xl text-[#0a4a2e]">
-                              {match.home_score} – {match.away_score}
-                            </span>
+                            {match.home_score !== null ? (
+                              <span className="font-display text-xl text-[#0a4a2e]">
+                                {match.home_score} – {match.away_score}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-400">Resultado pendiente</span>
+                            )}
                             {existingPick && (() => {
                               const isExact =
+                                match.home_score !== null &&
                                 existingPick.home_pick === match.home_score &&
                                 existingPick.away_pick === match.away_score;
                               return (
