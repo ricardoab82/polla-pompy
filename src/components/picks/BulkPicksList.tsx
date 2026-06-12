@@ -254,6 +254,16 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                         {status === 'error' && (
                           <span className="text-xs text-red-500">✗ {errors[match.id] ?? 'Error'}</span>
                         )}
+
+                        {/* Ver picks link for live/finished */}
+                        {(isLive || isFinished) && (
+                          <Link
+                            href={`/match/${match.id}`}
+                            className="text-xs text-[#0a4a2e] font-semibold underline hover:no-underline"
+                          >
+                            Ver picks →
+                          </Link>
+                        )}
                       </div>
 
                       {/* Away team */}

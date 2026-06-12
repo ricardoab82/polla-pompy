@@ -21,11 +21,11 @@ export default async function DashboardPage() {
 
   const myRank = leaderboard?.find((r) => r.user_id === user.id);
 
-  // Get next scheduled match
+  // Get next match (live first, then scheduled)
   const { data: nextMatch } = await supabase
     .from('matches')
-    .select('id, home_team, away_team, home_team_logo, away_team_logo, kickoff_utc, is_colombia_match')
-    .eq('status', 'scheduled')
+    .select('id, home_team, away_team, home_team_logo, away_team_logo, kickoff_utc, status, is_colombia_match')
+    .in('status', ['live', 'scheduled'])
     .order('kickoff_utc')
     .limit(1)
     .single();
@@ -99,9 +99,16 @@ export default async function DashboardPage() {
       {/* Next match countdown */}
       {nextMatch && (
         <div className="card">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Próximo partido
-          </p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              {nextMatch.status === 'live' ? '🔴 En vivo' : 'Próximo partido'}
+            </p>
+            {nextMatch.status === 'live' && (
+              <Link href={`/match/${nextMatch.id}`} className="text-xs text-[#0a4a2e] font-semibold underline hover:no-underline">
+                Ver picks →
+              </Link>
+            )}
+          </div>
           <div className="flex items-center justify-between gap-4">
             {/* Home team */}
             <div className="flex flex-col items-center gap-1 flex-1 min-w-0">
