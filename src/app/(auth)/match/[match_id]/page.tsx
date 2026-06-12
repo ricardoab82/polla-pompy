@@ -37,10 +37,18 @@ export default async function MatchDetailPage({
   const isPostKickoff = match.status !== 'scheduled';
 
   // Fetch picks (own always; others only post-kickoff)
-  const { data: picks } = await supabase
+  const { data: picks, error: picksError } = await supabase
     .from('picks')
     .select('user_id, home_pick, away_pick, is_auto_assigned, points_earned')
     .eq('match_id', match.id);
+
+  // --- TEMPORARY DEBUG ---
+  console.log('[match-detail] match_id:', params.match_id);
+  console.log('[match-detail] match.status:', match.status);
+  console.log('[match-detail] isPostKickoff:', isPostKickoff);
+  console.log('[match-detail] picks count:', picks?.length ?? 0);
+  console.log('[match-detail] picksError:', picksError);
+  // -----------------------
 
   // Fetch users for display
   const userIds = Array.from(new Set(picks?.map((p) => p.user_id) ?? []));
@@ -82,6 +90,15 @@ export default async function MatchDetailPage({
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      {/* TEMPORARY DEBUG PANEL — remove once issue is resolved */}
+      <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-xs font-mono space-y-1">
+        <p><strong>match.status:</strong> {match.status}</p>
+        <p><strong>isPostKickoff:</strong> {String(isPostKickoff)}</p>
+        <p><strong>picks returned:</strong> {picks?.length ?? 0}</p>
+        <p><strong>picksError:</strong> {picksError ? JSON.stringify(picksError) : 'none'}</p>
+        <p><strong>currentUser:</strong> {user.id}</p>
+      </div>
+
       {/* Match header */}
       <div className={`card ${match.is_colombia_match ? 'colombia-border' : ''}`}>
         <p className="text-xs text-gray-500 text-center mb-3 uppercase tracking-wide">
