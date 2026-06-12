@@ -193,16 +193,28 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                             <span className="font-display text-xl text-[#0a4a2e]">
                               {match.home_score} – {match.away_score}
                             </span>
-                            {existingPick && (
-                              <span className={`text-sm font-display ${pointsColor}`}>
-                                pick: {existingPick.home_pick}–{existingPick.away_pick}
-                                {existingPick.points_earned !== null && (
-                                  <span className="ml-1">
-                                    ({existingPick.points_earned > 0 ? `+${existingPick.points_earned}` : existingPick.points_earned} pts)
+                            {existingPick && (() => {
+                              const isExact =
+                                existingPick.home_pick === match.home_score &&
+                                existingPick.away_pick === match.away_score;
+                              return (
+                                <>
+                                  <span className={`text-sm font-display ${pointsColor}`}>
+                                    pick: {existingPick.home_pick}–{existingPick.away_pick}
                                   </span>
-                                )}
-                              </span>
-                            )}
+                                  {isExact && (
+                                    <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                      Exacto ✓
+                                    </span>
+                                  )}
+                                  <span className={`text-sm font-bold ${pointsColor || 'text-gray-500'}`}>
+                                    {existingPick.points_earned !== null
+                                      ? `${existingPick.points_earned > 0 ? '+' : ''}${existingPick.points_earned} pts`
+                                      : '— pts'}
+                                  </span>
+                                </>
+                              );
+                            })()}
                           </div>
                         ) : isLocked ? (
                           <div className="flex flex-col items-center gap-0.5">
