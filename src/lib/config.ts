@@ -1,3 +1,6 @@
+// Maintenance mode — set to true to redirect all users to /maintenance
+export const MAINTENANCE_MODE = false;
+
 // Feature flags — set to false to disable without deleting code
 export const FEATURES = {
   bonusQuestions:    true,

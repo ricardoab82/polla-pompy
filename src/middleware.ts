@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { MAINTENANCE_MODE } from '@/lib/config';
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -29,12 +30,39 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   console.log(`[middleware] ${pathname} | user: ${user?.id ?? 'none'} | err: ${userErr?.message ?? 'none'}`);
 
+  // Maintenance mode gate
+  if (MAINTENANCE_MODE) {
+    const isMaintenancePage = pathname.startsWith('/maintenance');
+    const isAdminRoute      = pathname.startsWith('/admin');
+    const isApiRoute        = pathname.startsWith('/api');
+
+    if (!isMaintenancePage && !isAdminRoute && !isApiRoute) {
+      // Allow admin / co-admin users to bypass
+      let isAdmin = false;
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        isAdmin = profile?.role === 'admin' || profile?.role === 'co-admin';
+      }
+
+      if (!isAdmin) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/maintenance';
+        return NextResponse.redirect(url);
+      }
+    }
+  }
+
   const isPublicRoute =
     pathname === '/' ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
     pathname.startsWith('/auth') ||
-    pathname.startsWith('/api/cron/');
+    pathname.startsWith('/api/cron/') ||
+    pathname.startsWith('/maintenance');
 
   // Redirect unauthenticated users away from protected routes
   if (!user && !isPublicRoute) {
