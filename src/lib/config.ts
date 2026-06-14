@@ -1,5 +1,5 @@
 // Maintenance mode — set to true to redirect all users to /maintenance
-export const MAINTENANCE_MODE = false;
+export const MAINTENANCE_MODE = true;
 
 // Feature flags — set to false to disable without deleting code
 export const FEATURES = {
