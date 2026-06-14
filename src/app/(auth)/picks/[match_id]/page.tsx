@@ -45,8 +45,12 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
   const [awayPick, setAwayPick]   = useState('');
   const [answerValues, setAnswerValues] = useState<Record<string, string>>({});
 
-  const [pickPending,   startPickTransition]   = useTransition();
-  const [answerPending, startAnswerTransition] = useTransition();
+  const [pickPending, startPickTransition] = useTransition();
+
+  // Per-question autosave state (avoids shared-transition race condition)
+  const [answerStatuses, setAnswerStatuses] = useState<Record<string, 'saving' | 'saved' | 'error'>>({});
+  const [answerErrors,   setAnswerErrors]   = useState<Record<string, string>>({});
+  const [lastSavedAnswers, setLastSavedAnswers] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const supabase = createClient();
@@ -129,16 +133,29 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
     });
   }
 
-  function handleAnswerSubmit(questionId: string) {
+  async function handleAnswerBlur(questionId: string) {
+    const value = answerValues[questionId]?.trim();
+    if (!value) return;
+    // Skip if nothing changed since last successful save
+    if (lastSavedAnswers[questionId] === value) return;
+    // Skip if already saving
+    if (answerStatuses[questionId] === 'saving') return;
+
+    setAnswerStatuses((prev) => ({ ...prev, [questionId]: 'saving' }));
+    setAnswerErrors((prev) => { const n = { ...prev }; delete n[questionId]; return n; });
+
     const fd = new FormData();
     fd.set('question_id', questionId);
-    fd.set('answer', answerValues[questionId] ?? '');
+    fd.set('answer', value);
 
-    startAnswerTransition(async () => {
-      const result = await submitBonusAnswerAction(fd);
-      if (result?.error) toast(result.error, 'error');
-      else toast('✅ Respuesta guardada', 'success');
-    });
+    const result = await submitBonusAnswerAction(fd);
+    if (result?.error) {
+      setAnswerStatuses((prev) => ({ ...prev, [questionId]: 'error' }));
+      setAnswerErrors((prev) => ({ ...prev, [questionId]: result.error! }));
+    } else {
+      setAnswerStatuses((prev) => ({ ...prev, [questionId]: 'saved' }));
+      setLastSavedAnswers((prev) => ({ ...prev, [questionId]: value }));
+    }
   }
 
   const pointsColor =
@@ -311,22 +328,28 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
                     {myAnswer ? <span>Tu respuesta: <strong>{myAnswer.answer}</strong></span> : 'No respondiste esta pregunta.'}
                   </p>
                 ) : (
-                  <div className="flex gap-2">
+                  <div className="space-y-1">
                     <input
                       type="text"
                       value={answerValues[q.id] ?? ''}
-                      onChange={(e) => setAnswerValues((prev) => ({ ...prev, [q.id]: e.target.value }))}
-                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
+                      onChange={(e) => {
+                        setAnswerValues((prev) => ({ ...prev, [q.id]: e.target.value }));
+                        setAnswerStatuses((prev) => { const n = { ...prev }; delete n[q.id]; return n; });
+                      }}
+                      onBlur={() => handleAnswerBlur(q.id)}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                  focus:border-[#0a4a2e] focus:outline-none"
-                      placeholder="Tu respuesta..."
+                      placeholder="Tu respuesta... (se guarda al salir del campo)"
                     />
-                    <button
-                      onClick={() => handleAnswerSubmit(q.id)}
-                      disabled={answerPending || !answerValues[q.id]}
-                      className="btn-primary text-sm px-4 py-2 rounded-lg flex-none"
-                    >
-                      {isAnswered ? 'Actualizar' : 'Guardar'}
-                    </button>
+                    {answerStatuses[q.id] === 'saving' && (
+                      <p className="text-xs text-gray-400">Guardando...</p>
+                    )}
+                    {answerStatuses[q.id] === 'saved' && (
+                      <p className="text-xs text-green-600 font-medium">✓ Guardado</p>
+                    )}
+                    {answerStatuses[q.id] === 'error' && (
+                      <p className="text-xs text-red-500">✗ {answerErrors[q.id] ?? 'Error al guardar'}</p>
+                    )}
                   </div>
                 )}
               </div>
