@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
-export default function UpdatePasswordPage() {
+function UpdatePasswordForm() {
   const router                      = useRouter();
   const searchParams                = useSearchParams();
   const [ready, setReady]           = useState(false);
@@ -121,5 +121,13 @@ export default function UpdatePasswordPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function UpdatePasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#f9fafb] flex items-center justify-center text-gray-400">Cargando...</div>}>
+      <UpdatePasswordForm />
+    </Suspense>
   );
 }
