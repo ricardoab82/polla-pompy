@@ -62,7 +62,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/register') ||
     pathname.startsWith('/auth') ||
     pathname.startsWith('/api/cron/') ||
-    pathname.startsWith('/maintenance');
+    pathname.startsWith('/maintenance') ||
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/update-password');
 
   // Redirect unauthenticated users away from protected routes
   if (!user && !isPublicRoute) {
