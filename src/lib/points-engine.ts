@@ -172,7 +172,7 @@ export async function gradeBonusAnswers(questionId: string): Promise<{
 
   // text type: skip auto-grading (admin grades manually by setting correct_answer,
   // but we still do exact-match so they can trigger it if they want)
-  const answerType    = (question as any).answer_type ?? 'text';
+  const answerType    = question.answer_type ?? 'text';
   const correctAnswer = question.correct_answer.trim().toLowerCase();
 
   const { data: answers, error: aErr } = await supabase
