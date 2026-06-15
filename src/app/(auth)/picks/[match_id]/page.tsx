@@ -299,7 +299,6 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
           <h2 className="font-display text-2xl text-[#0a4a2e]">Preguntas Bonus</h2>
           {questions.map((q) => {
             const myAnswer = myAnswers.get(q.id);
-            const isAnswered = !!myAnswer;
             return (
               <div key={q.id} className="border border-gray-100 rounded-xl p-4">
                 <div className="flex items-start justify-between gap-2 mb-2">
