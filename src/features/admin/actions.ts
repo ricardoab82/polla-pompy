@@ -76,6 +76,7 @@ export async function createBonusQuestionAction(formData: FormData) {
     match_id:      formData.get('match_id') as string,
     question_text: formData.get('question_text') as string,
     points_value:  Number(formData.get('points_value')),
+    answer_type:   (formData.get('answer_type') as string) || 'text',
   };
 
   const parsed = BonusQuestionSchema.safeParse(raw);

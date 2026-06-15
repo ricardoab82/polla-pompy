@@ -51,17 +51,33 @@ export default async function AdminBonusMatchPage({ params }: { params: { match_
                 placeholder="¿Cuántos corners habrá en el partido?"
               />
             </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">Puntos (1–10)</label>
-              <input
-                type="number"
-                name="points_value"
-                min="1"
-                max="10"
-                defaultValue="2"
-                className="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm
-                           focus:border-[#0a4a2e] focus:outline-none"
-              />
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="block text-sm text-gray-600 mb-1">Tipo de respuesta</label>
+                <select
+                  name="answer_type"
+                  defaultValue="text"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                             focus:border-[#0a4a2e] focus:outline-none bg-white"
+                >
+                  <option value="text">Texto libre</option>
+                  <option value="yes_no">Sí / No</option>
+                  <option value="team">Equipo del partido</option>
+                  <option value="number">Número</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Puntos (1–10)</label>
+                <input
+                  type="number"
+                  name="points_value"
+                  min="1"
+                  max="10"
+                  defaultValue="2"
+                  className="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm
+                             focus:border-[#0a4a2e] focus:outline-none"
+                />
+              </div>
             </div>
             <button type="submit" className="btn-primary rounded-lg py-2.5 px-6">
               Agregar pregunta
@@ -88,15 +104,49 @@ export default async function AdminBonusMatchPage({ params }: { params: { match_
             {!q.correct_answer ? (
               <form action={formAction(setCorrectAnswerAction)} className="flex gap-2">
                 <input type="hidden" name="question_id" value={q.id} />
-                <input
-                  type="text"
-                  name="correct_answer"
-                  required
-                  className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
-                             focus:border-[#0a4a2e] focus:outline-none"
-                  placeholder="Respuesta correcta..."
-                />
-                <button type="submit" className="text-sm btn-secondary rounded-lg px-4 py-2">
+                {q.answer_type === 'yes_no' ? (
+                  <select
+                    name="correct_answer"
+                    required
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
+                               focus:border-[#0a4a2e] focus:outline-none bg-white"
+                  >
+                    <option value="">Seleccionar respuesta...</option>
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
+                  </select>
+                ) : q.answer_type === 'team' ? (
+                  <select
+                    name="correct_answer"
+                    required
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
+                               focus:border-[#0a4a2e] focus:outline-none bg-white"
+                  >
+                    <option value="">Seleccionar equipo...</option>
+                    <option value={match.home_team}>{match.home_team}</option>
+                    <option value={match.away_team}>{match.away_team}</option>
+                    <option value="Ninguno">Ninguno</option>
+                  </select>
+                ) : q.answer_type === 'number' ? (
+                  <input
+                    type="number"
+                    name="correct_answer"
+                    required
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
+                               focus:border-[#0a4a2e] focus:outline-none"
+                    placeholder="Número correcto..."
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    name="correct_answer"
+                    required
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
+                               focus:border-[#0a4a2e] focus:outline-none"
+                    placeholder="Respuesta correcta..."
+                  />
+                )}
+                <button type="submit" className="text-sm btn-secondary rounded-lg px-4 py-2 flex-none">
                   Calificar
                 </button>
               </form>

@@ -93,6 +93,7 @@ export interface BonusQuestionRow {
   created_by:     string;
   created_at:     string;
   answered_at:    string | null;
+  answer_type:    'text' | 'yes_no' | 'team' | 'number';
 }
 
 export interface BonusAnswerRow {

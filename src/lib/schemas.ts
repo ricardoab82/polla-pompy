@@ -38,6 +38,7 @@ export const BonusQuestionSchema = z.object({
   match_id:      z.string().uuid(),
   question_text: z.string().min(5).max(500),
   points_value:  z.number().int().min(1).max(10),
+  answer_type:   z.enum(['text', 'yes_no', 'team', 'number']).default('text'),
 });
 
 export const UpdateDisplayNameSchema = z.object({

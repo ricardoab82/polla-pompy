@@ -133,6 +133,29 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
     });
   }
 
+  // For yes_no / team: save immediately with the chosen value (no blur needed)
+  async function handleAnswerSelect(questionId: string, value: string) {
+    if (!value) return;
+    setAnswerValues((prev) => ({ ...prev, [questionId]: value }));
+    if (lastSavedAnswers[questionId] === value) return;
+
+    setAnswerStatuses((prev) => ({ ...prev, [questionId]: 'saving' }));
+    setAnswerErrors((prev) => { const n = { ...prev }; delete n[questionId]; return n; });
+
+    const fd = new FormData();
+    fd.set('question_id', questionId);
+    fd.set('answer', value);
+
+    const result = await submitBonusAnswerAction(fd);
+    if (result?.error) {
+      setAnswerStatuses((prev) => ({ ...prev, [questionId]: 'error' }));
+      setAnswerErrors((prev) => ({ ...prev, [questionId]: result.error! }));
+    } else {
+      setAnswerStatuses((prev) => ({ ...prev, [questionId]: 'saved' }));
+      setLastSavedAnswers((prev) => ({ ...prev, [questionId]: value }));
+    }
+  }
+
   async function handleAnswerBlur(questionId: string) {
     const value = answerValues[questionId]?.trim();
     if (!value) return;
@@ -328,18 +351,62 @@ export default function PickDetailPage({ params }: { params: { match_id: string 
                   </p>
                 ) : (
                   <div className="space-y-1">
-                    <input
-                      type="text"
-                      value={answerValues[q.id] ?? ''}
-                      onChange={(e) => {
-                        setAnswerValues((prev) => ({ ...prev, [q.id]: e.target.value }));
-                        setAnswerStatuses((prev) => { const n = { ...prev }; delete n[q.id]; return n; });
-                      }}
-                      onBlur={() => handleAnswerBlur(q.id)}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
-                                 focus:border-[#0a4a2e] focus:outline-none"
-                      placeholder="Tu respuesta... (se guarda al salir del campo)"
-                    />
+                    {q.answer_type === 'yes_no' ? (
+                      <div className="flex gap-2">
+                        {['Sí', 'No'].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => handleAnswerSelect(q.id, opt)}
+                            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border-2 transition-colors
+                              ${answerValues[q.id] === opt
+                                ? 'bg-[#0a4a2e] text-white border-[#0a4a2e]'
+                                : 'bg-white text-gray-700 border-gray-200 hover:border-[#0a4a2e]'}`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    ) : q.answer_type === 'team' ? (
+                      <select
+                        value={answerValues[q.id] ?? ''}
+                        onChange={(e) => handleAnswerSelect(q.id, e.target.value)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                   focus:border-[#0a4a2e] focus:outline-none bg-white"
+                      >
+                        <option value="">Selecciona un equipo...</option>
+                        <option value={match!.home_team}>{match!.home_team}</option>
+                        <option value={match!.away_team}>{match!.away_team}</option>
+                        <option value="Ninguno">Ninguno</option>
+                      </select>
+                    ) : q.answer_type === 'number' ? (
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        value={answerValues[q.id] ?? ''}
+                        onChange={(e) => {
+                          setAnswerValues((prev) => ({ ...prev, [q.id]: e.target.value }));
+                          setAnswerStatuses((prev) => { const n = { ...prev }; delete n[q.id]; return n; });
+                        }}
+                        onBlur={() => handleAnswerBlur(q.id)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                   focus:border-[#0a4a2e] focus:outline-none"
+                        placeholder="Tu respuesta numérica..."
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={answerValues[q.id] ?? ''}
+                        onChange={(e) => {
+                          setAnswerValues((prev) => ({ ...prev, [q.id]: e.target.value }));
+                          setAnswerStatuses((prev) => { const n = { ...prev }; delete n[q.id]; return n; });
+                        }}
+                        onBlur={() => handleAnswerBlur(q.id)}
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                   focus:border-[#0a4a2e] focus:outline-none"
+                        placeholder="Tu respuesta... (se guarda al salir del campo)"
+                      />
+                    )}
                     {answerStatuses[q.id] === 'saving' && (
                       <p className="text-xs text-gray-400">Guardando...</p>
                     )}

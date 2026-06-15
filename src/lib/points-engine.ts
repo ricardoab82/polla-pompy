@@ -161,7 +161,7 @@ export async function gradeBonusAnswers(questionId: string): Promise<{
 
   const { data: question, error: qErr } = await supabase
     .from('bonus_questions')
-    .select('id, correct_answer, points_value, answered_at')
+    .select('id, correct_answer, points_value, answered_at, answer_type')
     .eq('id', questionId)
     .single();
 
@@ -169,6 +169,11 @@ export async function gradeBonusAnswers(questionId: string): Promise<{
     errors.push(`Question not found or no correct answer: ${qErr?.message}`);
     return { graded, errors };
   }
+
+  // text type: skip auto-grading (admin grades manually by setting correct_answer,
+  // but we still do exact-match so they can trigger it if they want)
+  const answerType    = (question as any).answer_type ?? 'text';
+  const correctAnswer = question.correct_answer.trim().toLowerCase();
 
   const { data: answers, error: aErr } = await supabase
     .from('bonus_answers')
@@ -180,10 +185,13 @@ export async function gradeBonusAnswers(questionId: string): Promise<{
     return { graded, errors };
   }
 
-  const correctAnswer = question.correct_answer.trim().toLowerCase();
-
   for (const ans of answers ?? []) {
-    const isCorrect  = ans.answer.trim().toLowerCase() === correctAnswer;
+    let isCorrect: boolean;
+    if (answerType === 'number') {
+      isCorrect = Number(ans.answer.trim()) === Number(question.correct_answer.trim());
+    } else {
+      isCorrect = ans.answer.trim().toLowerCase() === correctAnswer;
+    }
     const pointsEarned = isCorrect ? question.points_value : 0;
 
     const { error: updateErr } = await supabase
