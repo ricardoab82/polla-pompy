@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { submitBulkPicksAction } from '@/features/picks/actions';
@@ -124,6 +124,32 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
     byPhase.get(m.phase)!.push(m);
   }
 
+  // Find first upcoming (not yet locked) match across phases
+  let firstUpcomingMatchId: string | null = null;
+  outer: for (const phase of PHASE_ORDER) {
+    const phaseMatches = byPhase.get(phase);
+    if (!phaseMatches) continue;
+    for (const m of phaseMatches) {
+      const lockTime = new Date(new Date(m.kickoff_utc).getTime() - PICK_LOCK_MINUTES * 60 * 1000);
+      if (new Date() < lockTime) {
+        firstUpcomingMatchId = m.id;
+        break outer;
+      }
+    }
+  }
+
+  const firstUpcomingRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (firstUpcomingRef.current) {
+      firstUpcomingRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
+  function scrollToUpcoming() {
+    firstUpcomingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   if (!matches.length) {
     return (
       <div className="text-center py-12 text-gray-400">
@@ -135,7 +161,19 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-display text-4xl text-[#0a4a2e]">Mis Picks</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-display text-4xl text-[#0a4a2e]">Mis Picks</h1>
+        {firstUpcomingMatchId && (
+          <button
+            onClick={scrollToUpcoming}
+            className="flex items-center gap-1.5 text-sm font-semibold text-[#0a4a2e]
+                       bg-[#e8f5e9] hover:bg-[#0a4a2e] hover:text-white
+                       px-3 py-1.5 rounded-full transition-colors"
+          >
+            Próximos partidos ↓
+          </button>
+        )}
+      </div>
 
       {PHASE_ORDER.map((phase) => {
         const phaseMatches = byPhase.get(phase);
@@ -161,6 +199,7 @@ export default function BulkPicksList({ matches, picks, bonusCounts }: Props) {
                 return (
                   <div
                     key={match.id}
+                    ref={match.id === firstUpcomingMatchId ? firstUpcomingRef : null}
                     className={`card py-3 px-4 ${match.is_colombia_match ? 'colombia-border' : ''}
                                 ${isLive            ? 'ring-2 ring-green-400' : ''}
                                 ${status === 'saved' ? 'ring-1 ring-green-300' : ''}
