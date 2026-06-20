@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
-import ProgressionChart, { type ChartDataPoint } from '@/components/standings/ProgressionChart';
+import BumpChart, { type BumpChartPoint } from '@/components/standings/BumpChart';
 import { FEATURES } from '@/lib/config';
 import AutoRefresh from '@/components/ui/AutoRefresh';
 
@@ -11,34 +11,50 @@ export default async function StandingsPage() {
   if (!user) redirect('/login');
 
   const [leaderboardRes, historyRes] = await Promise.all([
-    supabase.from('leaderboard').select('*')
+    supabase
+      .from('leaderboard')
+      .select('*')
       .order('total_points', { ascending: false })
       .order('exact_results_count', { ascending: false })
       .order('bonus_pts', { ascending: false }),
     FEATURES.progressionChart
       ? supabase
           .from('position_history')
-          .select('user_id, snapshot_at, position')
+          .select('user_id, snapshot_at, position, total_points')
           .order('snapshot_at')
       : Promise.resolve({ data: null }),
   ]);
 
   const leaderboard = leaderboardRes.data ?? [];
-
-  // Build chart data: group snapshots by date, one column per user display name
   const userIdToName = new Map(leaderboard.map((r) => [r.user_id, r.display_name]));
-  const byDate = new Map<string, ChartDataPoint>();
+
+  // Build bump chart data: group by distinct snapshot_at, label as J1, J2, …
+  // Each distinct snapshot represents one match that finished.
+  // Take the last 10 snapshots to keep the chart readable.
+  const snapsByTime = new Map<string, Map<string, number>>();
+  const userLatestPoints = new Map<string, number>();
+
   for (const entry of historyRes.data ?? []) {
-    const date = new Date(entry.snapshot_at).toLocaleDateString('es-CO', {
-      timeZone: 'America/Bogota', day: 'numeric', month: 'short',
-    });
-    if (!byDate.has(date)) byDate.set(date, { date });
     const name = userIdToName.get(entry.user_id);
-    if (name) byDate.get(date)![name] = entry.position;
+    if (!name) continue;
+    if (!snapsByTime.has(entry.snapshot_at)) snapsByTime.set(entry.snapshot_at, new Map());
+    snapsByTime.get(entry.snapshot_at)!.set(name, entry.position);
+    // Keep overwriting so we end up with the latest total_points per user
+    userLatestPoints.set(name, entry.total_points);
   }
 
-  const chartData       = Array.from(byDate.values());
-  const chartUsers      = leaderboard.map((r) => r.display_name);
+  const sortedTimes = Array.from(snapsByTime.keys()).sort();
+  const lastTen    = sortedTimes.slice(-10);
+
+  const chartData: BumpChartPoint[] = lastTen.map((ts, i) => {
+    const point: BumpChartPoint = { label: `J${i + 1}` };
+    snapsByTime.get(ts)!.forEach((pos, name) => { point[name] = pos; });
+    return point;
+  });
+
+  // Only show users who have earned at least 1 point (suppresses 0-point clutter)
+  const allUsers     = leaderboard.map((r) => r.display_name);
+  const activeUsers  = allUsers.filter((name) => (userLatestPoints.get(name) ?? 0) > 0);
   const currentUserName = leaderboard.find((r) => r.user_id === user.id)?.display_name ?? '';
 
   return (
@@ -54,18 +70,24 @@ export default async function StandingsPage() {
             La tabla se actualizará cuando comiencen los partidos.
           </p>
         )}
+
+        {/* Tiebreaker note */}
+        <p className="mt-4 text-xs text-gray-400 text-center">
+          ⚖️ En caso de empate: 1° Mayor número de resultados exactos · 2° Mayor puntaje acumulado en Bonus
+        </p>
       </div>
 
       {FEATURES.progressionChart && (
         <div className="card">
           <h2 className="font-display text-2xl text-[#0a4a2e] mb-4">Progresión de posiciones</h2>
-          <ProgressionChart data={chartData} users={chartUsers} currentUser={currentUserName} />
+          <BumpChart
+            data={chartData}
+            users={activeUsers}
+            currentUser={currentUserName}
+            totalUsers={leaderboard.length}
+          />
         </div>
       )}
-
-      <p className="text-xs text-gray-400 text-center">
-        Desempate: mayor cantidad de resultados exactos. Si sigue empatado, el premio se divide.
-      </p>
     </div>
   );
 }
