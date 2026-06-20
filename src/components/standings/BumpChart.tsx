@@ -51,10 +51,6 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 export default function BumpChart({ data, users, currentUser, totalUsers }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // DEBUG — visible in browser console (client component)
-  console.log('[BumpChart] data points received:', data.length, data.map(d => d.label));
-  console.log('[BumpChart] users:', users.length, users);
-
   // Scroll to the rightmost (most recent) data on mount and when data changes
   useEffect(() => {
     if (scrollRef.current) {

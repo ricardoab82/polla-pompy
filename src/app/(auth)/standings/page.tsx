@@ -10,7 +10,7 @@ export default async function StandingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const [leaderboardRes, historyRes] = await Promise.all([
+  const [leaderboardRes, bumpRes] = await Promise.all([
     supabase
       .from('leaderboard')
       .select('*')
@@ -18,76 +18,34 @@ export default async function StandingsPage() {
       .order('exact_results_count', { ascending: false })
       .order('bonus_pts', { ascending: false }),
     FEATURES.progressionChart
-      ? supabase
-          .from('position_history')
-          .select('user_id, snapshot_at, position, total_points')
-          .order('snapshot_at')
-          .limit(10000)
+      ? supabase.rpc('get_bump_chart_data')
       : Promise.resolve({ data: null }),
   ]);
 
   const leaderboard = leaderboardRes.data ?? [];
-  const userIdToName = new Map(leaderboard.map((r) => [r.user_id, r.display_name]));
 
-  // Build bump chart data grouped by Colombia-time calendar day.
-  //
-  // snapshotPositions() runs after every finished match, and admin
-  // recalculations can fire dozens of snapshots within seconds.
-  // We group by Colombia-time date and keep ONLY the LAST snapshot
-  // of each day, so recalculation noise is suppressed and each chart
-  // point reflects the final standings at end-of-day.
-  //
-  // Single-pass approach (data already sorted ASC by snapshot_at):
-  // when snapshot_at changes within the same Colombia day, we reset
-  // that day's position map so only the last snapshot's data survives.
-  const toColombiaDate = (ts: string) =>
-    new Date(ts).toLocaleDateString('es-CO', {
-      timeZone: 'America/Bogota', day: 'numeric', month: 'short',
-    });
-
-  const snapsByDay       = new Map<string, { ts: string; positions: Map<string, number> }>();
+  // Build chart data from the RPC result.
+  // The RPC returns one row per (match × user), already ordered by match_order.
+  // Group rows by match_order to produce one BumpChartPoint per match.
   const userLatestPoints = new Map<string, number>();
+  const matchPoints      = new Map<number, BumpChartPoint>();
 
-  for (const entry of historyRes.data ?? []) {
-    const name = userIdToName.get(entry.user_id);
-    if (!name) continue;
-
-    const day      = toColombiaDate(entry.snapshot_at);
-    const existing = snapsByDay.get(day);
-
-    if (!existing || existing.ts !== entry.snapshot_at) {
-      // New (later) snapshot for this day — start fresh with this user
-      snapsByDay.set(day, {
-        ts:        entry.snapshot_at,
-        positions: new Map([[name, entry.position]]),
-      });
-    } else {
-      // Same snapshot batch — add this user's position
-      existing.positions.set(name, entry.position);
+  for (const row of bumpRes.data ?? []) {
+    if (!matchPoints.has(row.match_order)) {
+      matchPoints.set(row.match_order, { label: row.x_label });
     }
-
-    userLatestPoints.set(name, entry.total_points);
+    matchPoints.get(row.match_order)![row.display_name] = row.user_position;
+    userLatestPoints.set(row.display_name, row.total_points);
   }
 
-  // DEBUG — visible in Vercel function logs (server component)
-  console.log('[standings] position_history rows returned:', historyRes.data?.length ?? 0);
-  console.log('[standings] unique Colombia days found:', snapsByDay.size, Array.from(snapsByDay.keys()));
+  const chartData: BumpChartPoint[] = Array.from(matchPoints.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([, point]) => point);
 
-  // Sort days by their canonical snapshot timestamp — show all available days
-  const sortedDays = Array.from(snapsByDay.entries())
-    .sort((a, b) => a[1].ts.localeCompare(b[1].ts));
-
-  const chartData: BumpChartPoint[] = sortedDays.map(([label, { positions }]) => {
-    const point: BumpChartPoint = { label };
-    positions.forEach((pos, name) => { point[name] = pos; });
-    return point;
-  });
-
-  console.log('[standings] chartData points:', chartData.length, chartData.map(d => d.label));
-
-  // Only show users who have earned at least 1 point (suppresses 0-point clutter)
-  const allUsers        = leaderboard.map((r) => r.display_name);
-  const activeUsers     = allUsers.filter((name) => (userLatestPoints.get(name) ?? 0) > 0);
+  // Only show users who have earned at least 1 point
+  const activeUsers     = leaderboard
+    .map((r) => r.display_name)
+    .filter((name) => (userLatestPoints.get(name) ?? 0) > 0);
   const currentUserName = leaderboard.find((r) => r.user_id === user.id)?.display_name ?? '';
 
   return (
