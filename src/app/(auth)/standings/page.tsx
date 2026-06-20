@@ -30,46 +30,52 @@ export default async function StandingsPage() {
 
   // Build bump chart data grouped by Colombia-time calendar day.
   //
-  // Why by day: snapshotPositions() runs after every match and recalculations
-  // can produce dozens of snapshots within seconds. Taking raw "last 10 timestamps"
-  // would show only today's positions across all chart points. Instead we:
-  //   1. Find the LAST snapshot_at for each calendar day (Colombia UTC-5)
-  //   2. Read positions only from those canonical snapshots
-  //   3. Show last 10 days — one meaningful data point per matchday
+  // snapshotPositions() runs after every finished match, and admin
+  // recalculations can fire dozens of snapshots within seconds.
+  // We group by Colombia-time date and keep ONLY the LAST snapshot
+  // of each day, so recalculation noise is suppressed and each chart
+  // point reflects the final standings at end-of-day.
+  //
+  // Single-pass approach (data already sorted ASC by snapshot_at):
+  // when snapshot_at changes within the same Colombia day, we reset
+  // that day's position map so only the last snapshot's data survives.
   const toColombiaDate = (ts: string) =>
     new Date(ts).toLocaleDateString('es-CO', {
       timeZone: 'America/Bogota', day: 'numeric', month: 'short',
     });
 
-  // 1. Latest snapshot_at per calendar day
-  const dayToLastTs = new Map<string, string>();
-  for (const entry of historyRes.data ?? []) {
-    const day = toColombiaDate(entry.snapshot_at);
-    const cur = dayToLastTs.get(day);
-    if (!cur || entry.snapshot_at > cur) dayToLastTs.set(day, entry.snapshot_at);
-  }
-  const canonicalTs = new Set(dayToLastTs.values());
-
-  // 2. Collect positions only from canonical snapshots
-  const snapsByTs        = new Map<string, Map<string, number>>();
+  const snapsByDay       = new Map<string, { ts: string; positions: Map<string, number> }>();
   const userLatestPoints = new Map<string, number>();
+
   for (const entry of historyRes.data ?? []) {
-    if (!canonicalTs.has(entry.snapshot_at)) continue;
     const name = userIdToName.get(entry.user_id);
     if (!name) continue;
-    if (!snapsByTs.has(entry.snapshot_at)) snapsByTs.set(entry.snapshot_at, new Map());
-    snapsByTs.get(entry.snapshot_at)!.set(name, entry.position);
+
+    const day      = toColombiaDate(entry.snapshot_at);
+    const existing = snapsByDay.get(day);
+
+    if (!existing || existing.ts !== entry.snapshot_at) {
+      // New (later) snapshot for this day — start fresh with this user
+      snapsByDay.set(day, {
+        ts:        entry.snapshot_at,
+        positions: new Map([[name, entry.position]]),
+      });
+    } else {
+      // Same snapshot batch — add this user's position
+      existing.positions.set(name, entry.position);
+    }
+
     userLatestPoints.set(name, entry.total_points);
   }
 
-  // 3. Sort days by their canonical timestamp, take last 10
-  const sortedDays = Array.from(dayToLastTs.entries())
-    .sort((a, b) => a[1].localeCompare(b[1]))
+  // Sort days by their canonical snapshot timestamp, take last 10
+  const sortedDays = Array.from(snapsByDay.entries())
+    .sort((a, b) => a[1].ts.localeCompare(b[1].ts))
     .slice(-10);
 
-  const chartData: BumpChartPoint[] = sortedDays.map(([label, ts]) => {
+  const chartData: BumpChartPoint[] = sortedDays.map(([label, { positions }]) => {
     const point: BumpChartPoint = { label };
-    snapsByTs.get(ts)?.forEach((pos, name) => { point[name] = pos; });
+    positions.forEach((pos, name) => { point[name] = pos; });
     return point;
   });
 
