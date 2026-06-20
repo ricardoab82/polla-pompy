@@ -18,7 +18,9 @@ export default async function DashboardPage() {
   const { data: leaderboard } = await supabase
     .from('leaderboard')
     .select('*')
-    .order('rank');
+    .order('total_points', { ascending: false })
+    .order('exact_results_count', { ascending: false })
+    .order('bonus_pts', { ascending: false });
 
   const myRank = leaderboard?.find((r) => r.user_id === user.id);
 

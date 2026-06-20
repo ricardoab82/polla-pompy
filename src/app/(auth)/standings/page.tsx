@@ -11,7 +11,10 @@ export default async function StandingsPage() {
   if (!user) redirect('/login');
 
   const [leaderboardRes, historyRes] = await Promise.all([
-    supabase.from('leaderboard').select('*').order('rank'),
+    supabase.from('leaderboard').select('*')
+      .order('total_points', { ascending: false })
+      .order('exact_results_count', { ascending: false })
+      .order('bonus_pts', { ascending: false }),
     FEATURES.progressionChart
       ? supabase
           .from('position_history')
