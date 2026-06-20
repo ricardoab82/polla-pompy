@@ -69,6 +69,10 @@ export default async function StandingsPage() {
     userLatestPoints.set(name, entry.total_points);
   }
 
+  // DEBUG — visible in Vercel function logs (server component)
+  console.log('[standings] position_history rows returned:', historyRes.data?.length ?? 0);
+  console.log('[standings] unique Colombia days found:', snapsByDay.size, Array.from(snapsByDay.keys()));
+
   // Sort days by their canonical snapshot timestamp — show all available days
   const sortedDays = Array.from(snapsByDay.entries())
     .sort((a, b) => a[1].ts.localeCompare(b[1].ts));
@@ -78,6 +82,8 @@ export default async function StandingsPage() {
     positions.forEach((pos, name) => { point[name] = pos; });
     return point;
   });
+
+  console.log('[standings] chartData points:', chartData.length, chartData.map(d => d.label));
 
   // Only show users who have earned at least 1 point (suppresses 0-point clutter)
   const allUsers        = leaderboard.map((r) => r.display_name);
