@@ -22,6 +22,7 @@ export default async function StandingsPage() {
           .from('position_history')
           .select('user_id, snapshot_at, position, total_points')
           .order('snapshot_at')
+          .limit(10000)
       : Promise.resolve({ data: null }),
   ]);
 
