@@ -28,33 +28,54 @@ export default async function StandingsPage() {
   const leaderboard = leaderboardRes.data ?? [];
   const userIdToName = new Map(leaderboard.map((r) => [r.user_id, r.display_name]));
 
-  // Build bump chart data: group by distinct snapshot_at, label as J1, J2, …
-  // Each distinct snapshot represents one match that finished.
-  // Take the last 10 snapshots to keep the chart readable.
-  const snapsByTime = new Map<string, Map<string, number>>();
-  const userLatestPoints = new Map<string, number>();
+  // Build bump chart data grouped by Colombia-time calendar day.
+  //
+  // Why by day: snapshotPositions() runs after every match and recalculations
+  // can produce dozens of snapshots within seconds. Taking raw "last 10 timestamps"
+  // would show only today's positions across all chart points. Instead we:
+  //   1. Find the LAST snapshot_at for each calendar day (Colombia UTC-5)
+  //   2. Read positions only from those canonical snapshots
+  //   3. Show last 10 days — one meaningful data point per matchday
+  const toColombiaDate = (ts: string) =>
+    new Date(ts).toLocaleDateString('es-CO', {
+      timeZone: 'America/Bogota', day: 'numeric', month: 'short',
+    });
 
+  // 1. Latest snapshot_at per calendar day
+  const dayToLastTs = new Map<string, string>();
   for (const entry of historyRes.data ?? []) {
+    const day = toColombiaDate(entry.snapshot_at);
+    const cur = dayToLastTs.get(day);
+    if (!cur || entry.snapshot_at > cur) dayToLastTs.set(day, entry.snapshot_at);
+  }
+  const canonicalTs = new Set(dayToLastTs.values());
+
+  // 2. Collect positions only from canonical snapshots
+  const snapsByTs        = new Map<string, Map<string, number>>();
+  const userLatestPoints = new Map<string, number>();
+  for (const entry of historyRes.data ?? []) {
+    if (!canonicalTs.has(entry.snapshot_at)) continue;
     const name = userIdToName.get(entry.user_id);
     if (!name) continue;
-    if (!snapsByTime.has(entry.snapshot_at)) snapsByTime.set(entry.snapshot_at, new Map());
-    snapsByTime.get(entry.snapshot_at)!.set(name, entry.position);
-    // Keep overwriting so we end up with the latest total_points per user
+    if (!snapsByTs.has(entry.snapshot_at)) snapsByTs.set(entry.snapshot_at, new Map());
+    snapsByTs.get(entry.snapshot_at)!.set(name, entry.position);
     userLatestPoints.set(name, entry.total_points);
   }
 
-  const sortedTimes = Array.from(snapsByTime.keys()).sort();
-  const lastTen    = sortedTimes.slice(-10);
+  // 3. Sort days by their canonical timestamp, take last 10
+  const sortedDays = Array.from(dayToLastTs.entries())
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .slice(-10);
 
-  const chartData: BumpChartPoint[] = lastTen.map((ts, i) => {
-    const point: BumpChartPoint = { label: `J${i + 1}` };
-    snapsByTime.get(ts)!.forEach((pos, name) => { point[name] = pos; });
+  const chartData: BumpChartPoint[] = sortedDays.map(([label, ts]) => {
+    const point: BumpChartPoint = { label };
+    snapsByTs.get(ts)?.forEach((pos, name) => { point[name] = pos; });
     return point;
   });
 
   // Only show users who have earned at least 1 point (suppresses 0-point clutter)
-  const allUsers     = leaderboard.map((r) => r.display_name);
-  const activeUsers  = allUsers.filter((name) => (userLatestPoints.get(name) ?? 0) > 0);
+  const allUsers        = leaderboard.map((r) => r.display_name);
+  const activeUsers     = allUsers.filter((name) => (userLatestPoints.get(name) ?? 0) > 0);
   const currentUserName = leaderboard.find((r) => r.user_id === user.id)?.display_name ?? '';
 
   return (
