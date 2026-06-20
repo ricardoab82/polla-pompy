@@ -68,10 +68,9 @@ export default async function StandingsPage() {
     userLatestPoints.set(name, entry.total_points);
   }
 
-  // Sort days by their canonical snapshot timestamp, take last 10
+  // Sort days by their canonical snapshot timestamp — show all available days
   const sortedDays = Array.from(snapsByDay.entries())
-    .sort((a, b) => a[1].ts.localeCompare(b[1].ts))
-    .slice(-10);
+    .sort((a, b) => a[1].ts.localeCompare(b[1].ts));
 
   const chartData: BumpChartPoint[] = sortedDays.map(([label, { positions }]) => {
     const point: BumpChartPoint = { label };
