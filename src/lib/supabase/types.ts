@@ -104,6 +104,20 @@ export interface BonusAnswerRow {
   is_correct:    boolean | null;
   points_earned: number | null;
   submitted_at:  string;
+  week_number:   number | null;
+}
+
+export interface BonusWeeklyStandingsRow {
+  id:                     string;
+  week_number:            number;
+  week_start:             string;
+  week_end:               string;
+  user_id:                string;
+  bonus_points_this_week: number;
+  rank:                   number;
+  sponsor_prize:          string | null;
+  finalized:              boolean;
+  created_at:             string;
 }
 
 export interface PositionHistoryRow {
@@ -175,6 +189,11 @@ export interface Database {
         Row:    BonusAnswerRow;
         Insert: Omit<BonusAnswerRow, 'id' | 'submitted_at'> & { id?: string; submitted_at?: string };
         Update: Partial<Omit<BonusAnswerRow, 'id' | 'submitted_at'> & { id?: string; submitted_at?: string }>;
+      };
+      bonus_weekly_standings: {
+        Row:    BonusWeeklyStandingsRow;
+        Insert: Omit<BonusWeeklyStandingsRow, 'id' | 'created_at'> & { id?: string; created_at?: string };
+        Update: Partial<Omit<BonusWeeklyStandingsRow, 'id' | 'created_at'> & { id?: string; created_at?: string }>;
       };
       position_history: {
         Row:    PositionHistoryRow;
