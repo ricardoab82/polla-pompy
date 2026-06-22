@@ -295,12 +295,14 @@ export async function closeBonusWeekAction(formData: FormData) {
 
   if (!users?.length) return { error: 'No hay usuarios activos' };
 
-  // Find question IDs whose match kickoff falls within this week's date range
+  // Find question IDs whose match kickoff falls within this week's date range.
+  // Dates are in Colombia time (COT = UTC-5), so end-of-day COT is next UTC day 04:59:59Z.
+  const weekEndCotUtc = new Date(`${weekEnd}T23:59:59-05:00`).toISOString();
   const { data: questionsInRange } = await supabase
     .from('bonus_questions')
     .select('id, matches!inner(kickoff_utc)')
     .gte('matches.kickoff_utc', `${weekStart}T00:00:00Z`)
-    .lte('matches.kickoff_utc', `${weekEnd}T23:59:59Z`);
+    .lte('matches.kickoff_utc', weekEndCotUtc);
 
   const questionIds = (questionsInRange ?? []).map((q) => q.id);
 
