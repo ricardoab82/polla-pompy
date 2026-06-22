@@ -85,6 +85,9 @@ export default async function AdminBonusPage() {
                   <p className="text-xs text-gray-400 mt-0.5">{dateLabel}</p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">
+                    {total} preguntas
+                  </span>
                   {isFullyGraded && (
                     <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
                       ✓ Calificado
@@ -114,6 +117,10 @@ export default async function AdminBonusPage() {
                 <p className="text-xs text-gray-400 mt-0.5">{dateLabel}</p>
               </div>
               <div className="flex items-center gap-2">
+                <span className={`text-xs px-2 py-0.5 rounded-full
+                  ${total > 0 ? 'bg-[#e8f5e9] text-[#0a4a2e]' : 'bg-gray-100 text-gray-400'}`}>
+                  {total} preguntas
+                </span>
                 {needsGrading ? (
                   <span className="text-sm font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800">
                     Calificar bonus →
