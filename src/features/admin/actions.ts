@@ -295,11 +295,21 @@ export async function closeBonusWeekAction(formData: FormData) {
 
   if (!users?.length) return { error: 'No hay usuarios activos' };
 
-  // Sum bonus points per user from open (week_number IS NULL) bonus_answers
+  // Find question IDs whose match kickoff falls within this week's date range
+  const { data: questionsInRange } = await supabase
+    .from('bonus_questions')
+    .select('id, matches!inner(kickoff_utc)')
+    .gte('matches.kickoff_utc', `${weekStart}T00:00:00Z`)
+    .lte('matches.kickoff_utc', `${weekEnd}T23:59:59Z`);
+
+  const questionIds = (questionsInRange ?? []).map((q) => q.id);
+
+  // Sum bonus points per user — only answers for this week's questions
   const { data: answerTotals } = await supabase
     .from('bonus_answers')
     .select('user_id, points_earned')
-    .is('week_number', null);
+    .is('week_number', null)
+    .in('question_id', questionIds.length > 0 ? questionIds : ['']);
 
   const ptsByUser = new Map<string, number>();
   for (const a of answerTotals ?? []) {
@@ -333,11 +343,14 @@ export async function closeBonusWeekAction(formData: FormData) {
 
   if (insertErr) return { error: insertErr.message };
 
-  // Mark all open bonus_answers with this week_number
-  await supabase
-    .from('bonus_answers')
-    .update({ week_number: weekNumber })
-    .is('week_number', null);
+  // Stamp only this week's answers — answers from other weeks stay unassigned
+  if (questionIds.length > 0) {
+    await supabase
+      .from('bonus_answers')
+      .update({ week_number: weekNumber })
+      .is('week_number', null)
+      .in('question_id', questionIds);
+  }
 
   revalidatePath('/admin/bonus-weeks');
   revalidatePath('/bonus-standings');
