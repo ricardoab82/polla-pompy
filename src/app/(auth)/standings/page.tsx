@@ -25,22 +25,28 @@ export default async function StandingsPage() {
   const leaderboard = leaderboardRes.data ?? [];
 
   // Build chart data from the RPC result.
-  // The RPC returns one row per (match × user), already ordered by match_order.
-  // Group rows by match_order to produce one BumpChartPoint per match.
+  // The RPC returns one row per (match × user), ordered by match_order ASC.
+  // Multiple matches can share the same x_label (Colombia date), so we group
+  // by x_label and overwrite positions as we go — the last write per label is
+  // the last match of that day, which is what we want.
   const userLatestPoints = new Map<string, number>();
-  const matchPoints      = new Map<number, BumpChartPoint>();
+  const labelPoints      = new Map<string, BumpChartPoint>(); // x_label → point
+  const labelOrder       = new Map<string, number>();          // x_label → last match_order seen
 
   for (const row of bumpRes.data ?? []) {
-    if (!matchPoints.has(row.match_order)) {
-      matchPoints.set(row.match_order, { label: row.x_label });
+    if (!labelPoints.has(row.x_label)) {
+      labelPoints.set(row.x_label, { label: row.x_label });
     }
-    matchPoints.get(row.match_order)![row.display_name] = row.user_position;
+    // Overwrite: data is ordered match_order ASC, so the last write per
+    // (x_label, user) reflects the latest match of that Colombia day.
+    labelPoints.get(row.x_label)![row.display_name] = row.user_position;
     userLatestPoints.set(row.display_name, row.total_points);
+    labelOrder.set(row.x_label, row.match_order);
   }
 
-  const chartData: BumpChartPoint[] = Array.from(matchPoints.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map(([, point]) => point);
+  const chartData: BumpChartPoint[] = Array.from(labelOrder.entries())
+    .sort((a, b) => a[1] - b[1])
+    .map(([label]) => labelPoints.get(label)!);
 
   // Only show users who have earned at least 1 point
   const activeUsers     = leaderboard
