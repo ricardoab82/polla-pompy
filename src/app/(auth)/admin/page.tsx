@@ -69,6 +69,7 @@ export default async function AdminDashboardPage() {
           { href: '/admin/bonus',         label: 'Preguntas bonus',       icon: '❓', desc: 'Crear, responder y calificar preguntas' },
           { href: '/admin/users',         label: 'Usuarios',              icon: '👥', desc: 'Roles, activar/desactivar cuentas' },
           { href: '/admin/special-picks', label: 'Picks especiales',      icon: '🏆', desc: 'Ver y calificar picks pre-torneo' },
+          { href: '/admin/bonus-weeks',   label: 'Semanas Bonus',         icon: '🗓️', desc: 'Crear y gestionar semanas de preguntas bonus' },
           { href: '/admin/settings',      label: 'Configuración',         icon: '⚙️', desc: 'Registro, fase, recalcular todo' },
         ].map((item) => (
           <Link key={item.href} href={item.href} className="card hover:shadow-md transition-shadow">
