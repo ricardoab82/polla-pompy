@@ -93,7 +93,7 @@ export default async function AdminBonusWeeksPage() {
         {/* Live bonus leaderboard */}
         <div>
           <h3 className="text-sm font-semibold text-gray-600 mb-2">Clasificación en vivo</h3>
-          {liveRanking.length === 0 ? (
+          {liveRanking.every((r) => r.bonus_pts === 0) ? (
             <p className="text-sm text-gray-400 py-2">Sin puntos bonus esta semana aún.</p>
           ) : (
             <div className="border border-gray-100 rounded-xl overflow-hidden">

@@ -48,7 +48,10 @@ export default async function BonusStandingsPage() {
   const INITIAL_WEEK_END = '2026-06-21';
   const lastClosedWeekEnd = (() => {
     if (!pastWeeks || pastWeeks.length === 0) return INITIAL_WEEK_END;
-    const sorted = [...pastWeeks].sort((a, b) => b.week_number - a.week_number);
+    // Sort by week_end DESC (not week_number — numbers can be non-sequential, e.g. 26, 2)
+    const sorted = [...pastWeeks].sort((a, b) =>
+      (b.week_end as string).localeCompare(a.week_end as string)
+    );
     return sorted[0].week_end as string;
   })();
   const currentWeekEnd = (() => {
