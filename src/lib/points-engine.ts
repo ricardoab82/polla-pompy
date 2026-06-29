@@ -7,6 +7,40 @@ import { calculatePoints } from '@/lib/scoring';
 import type { Phase } from '@/lib/scoring';
 import { sendPointsUpdatedEmail } from '@/lib/notifications';
 
+const KNOCKOUT_PHASES = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'final'] as const;
+
+// Advance the winner of a finished knockout match into the next match slot.
+// Called automatically when scores are decisive; can also be called manually by admin.
+export async function advanceBracketWinner(
+  matchId: string,
+  winner: 'home' | 'away',
+): Promise<{ advanced: boolean; error?: string }> {
+  const supabase = createServiceClient();
+
+  const { data: match } = await supabase
+    .from('matches')
+    .select('next_match_id, next_match_position, home_team, away_team, home_team_logo, away_team_logo')
+    .eq('id', matchId)
+    .single();
+
+  if (!match?.next_match_id || !match?.next_match_position) {
+    return { advanced: false }; // no bracket link configured yet
+  }
+
+  const teamName = winner === 'home' ? match.home_team : match.away_team;
+  const teamLogo = winner === 'home' ? match.home_team_logo : match.away_team_logo;
+  const teamCol  = match.next_match_position === 'home' ? 'home_team' : 'away_team';
+  const logoCol  = match.next_match_position === 'home' ? 'home_team_logo' : 'away_team_logo';
+
+  const { error } = await supabase
+    .from('matches')
+    .update({ [teamCol]: teamName, [logoCol]: teamLogo, updated_at: new Date().toISOString() })
+    .eq('id', match.next_match_id);
+
+  if (error) return { advanced: false, error: error.message };
+  return { advanced: true };
+}
+
 export async function calculateMatchPoints(matchId: string): Promise<{
   processed: number;
   errors: string[];
@@ -66,10 +100,20 @@ export async function calculateMatchPoints(matchId: string): Promise<{
     }
   }
 
-  // 4. Snapshot position_history
+  // 4. Auto-advance bracket winner for knockout matches with a decisive result.
+  //    Draws require admin override (extra time / penalties not tracked here).
+  if (
+    (KNOCKOUT_PHASES as readonly string[]).includes(match.phase) &&
+    match.home_score !== match.away_score
+  ) {
+    const winner = (match.home_score ?? 0) > (match.away_score ?? 0) ? 'home' : 'away';
+    await advanceBracketWinner(matchId, winner);
+  }
+
+  // 5. Snapshot position_history
   await snapshotPositions();
 
-  // 5. Send points-updated emails to all affected users
+  // 6. Send points-updated emails to all affected users
   if (picks?.length) {
     await sendPointsEmails(match, picks);
   }

@@ -2,7 +2,7 @@
 
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { BonusQuestionSchema } from '@/lib/schemas';
-import { calculateMatchPoints, gradeBonusAnswers } from '@/lib/points-engine';
+import { calculateMatchPoints, gradeBonusAnswers, advanceBracketWinner } from '@/lib/points-engine';
 import { revalidatePath } from 'next/cache';
 
 async function requireAdmin() {
@@ -51,6 +51,28 @@ export async function updateMatchResultAction(formData: FormData) {
   if (updateErr) return { error: updateErr.message };
 
   revalidatePath('/admin/matches');
+  return { success: true };
+}
+
+// Admin override: manually set which team advances from a knockout match
+// (used when the match was decided by extra time or penalties).
+export async function setMatchWinnerAction(formData: FormData) {
+  const { error } = await requireAdmin();
+  if (error) return { error };
+
+  const matchId = formData.get('match_id') as string;
+  const winner  = formData.get('winner') as 'home' | 'away';
+
+  if (!matchId || !['home', 'away'].includes(winner)) {
+    return { error: 'Datos inválidos' };
+  }
+
+  const result = await advanceBracketWinner(matchId, winner);
+  if (result.error) return { error: result.error };
+  if (!result.advanced) return { error: 'Este partido no tiene próximo partido configurado.' };
+
+  revalidatePath('/admin/matches');
+  revalidatePath('/bracket');
   return { success: true };
 }
 

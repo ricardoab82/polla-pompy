@@ -1,5 +1,5 @@
 import { requireAdmin } from '@/lib/auth-helpers';
-import { updateMatchResultAction, recalculateMatchPointsAction } from '@/features/admin/actions';
+import { updateMatchResultAction, recalculateMatchPointsAction, setMatchWinnerAction } from '@/features/admin/actions';
 import { formAction } from '@/lib/form-action';
 
 function formatKickoff(utc: string): string {
@@ -95,6 +95,28 @@ export default async function AdminMatchesPage() {
                       className="text-xs border border-[#0a4a2e] text-[#0a4a2e] px-3 py-1.5 rounded-lg font-semibold"
                     >
                       Recalcular pts
+                    </button>
+                  </form>
+                )}
+
+                {/* Bracket advancement override — for knockout matches with ET/penalties */}
+                {match.status === 'finished' &&
+                 match.next_match_id &&
+                 match.phase !== 'group' && (
+                  <form action={formAction(setMatchWinnerAction)} className="flex items-center gap-1">
+                    <input type="hidden" name="match_id" value={match.id} />
+                    <select
+                      name="winner"
+                      className="h-8 text-xs border border-amber-400 rounded px-1 text-gray-700"
+                    >
+                      <option value="home">{match.home_team}</option>
+                      <option value="away">{match.away_team}</option>
+                    </select>
+                    <button
+                      type="submit"
+                      className="text-xs bg-amber-500 text-white px-3 py-1.5 rounded-lg font-semibold"
+                    >
+                      Definir ganador
                     </button>
                   </form>
                 )}
