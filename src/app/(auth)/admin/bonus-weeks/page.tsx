@@ -1,9 +1,11 @@
 import { requireAdmin } from '@/lib/auth-helpers';
+import { createServiceClient } from '@/lib/supabase/server';
 import { closeBonusWeekAction, assignSponsorPrizeAction } from '@/features/admin/actions';
 import { formAction } from '@/lib/form-action';
 
 export default async function AdminBonusWeeksPage() {
   const { supabase } = await requireAdmin();
+  const serviceClient = createServiceClient();
 
   // Get closed weeks
   const { data: closedWeeks } = await supabase
@@ -43,7 +45,7 @@ export default async function AdminBonusWeeksPage() {
     defaultEnd = endDay.toISOString().split('T')[0];
   }
 
-  // Active users for display
+  // Active users for display (needed for week winners section)
   const { data: activeUsers } = await supabase
     .from('users')
     .select('id, display_name')
@@ -51,30 +53,15 @@ export default async function AdminBonusWeeksPage() {
 
   const userMap = new Map((activeUsers ?? []).map((u) => [u.id, u]));
 
-  // Open bonus answers (not yet assigned to a closed week)
-  const { data: openAnswers } = await supabase
-    .from('bonus_answers')
-    .select('user_id, points_earned')
-    .is('week_number', null)
-    .not('points_earned', 'is', null);
-
-  // Build live leaderboard
-  const ptsByUser = new Map<string, number>();
-  for (const a of openAnswers ?? []) {
-    ptsByUser.set(a.user_id, (ptsByUser.get(a.user_id) ?? 0) + (a.points_earned ?? 0));
-  }
-
-  const sorted = Array.from(ptsByUser.entries())
-    .map(([uid, pts]) => ({ uid, pts }))
-    .sort((a, b) => b.pts - a.pts);
+  // Live leaderboard — same RPC used by /bonus-standings (SECURITY DEFINER, no row limit)
+  const { data: rpcRows } = await serviceClient.rpc('get_current_week_bonus');
+  const rpcData = (rpcRows ?? []) as { user_id: string; display_name: string; bonus_pts: number }[];
 
   let rankCursor = 1;
-  const liveRanking = sorted
-    .map((r, i) => {
-      if (i > 0 && r.pts < sorted[i - 1].pts) rankCursor = i + 1;
-      return { ...r, rank: rankCursor, user: userMap.get(r.uid) };
-    })
-    .filter((r) => r.user != null);
+  const liveRanking = rpcData.map((r, i) => {
+    if (i > 0 && r.bonus_pts < rpcData[i - 1].bonus_pts) rankCursor = i + 1;
+    return { ...r, rank: rankCursor };
+  });
 
   // Winners of past weeks (rank = 1)
   const { data: weekWinners } = await supabase
@@ -120,10 +107,10 @@ export default async function AdminBonusWeeksPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {liveRanking.map((r) => (
-                    <tr key={r.uid} className="hover:bg-gray-50">
+                    <tr key={r.user_id} className="hover:bg-gray-50">
                       <td className="px-3 py-2 text-gray-500">{r.rank}</td>
-                      <td className="px-3 py-2 font-medium text-gray-900">{r.user?.display_name}</td>
-                      <td className="px-3 py-2 text-right font-semibold text-[#0a4a2e]">{r.pts}</td>
+                      <td className="px-3 py-2 font-medium text-gray-900">{r.display_name}</td>
+                      <td className="px-3 py-2 text-right font-semibold text-[#0a4a2e]">{r.bonus_pts}</td>
                     </tr>
                   ))}
                 </tbody>

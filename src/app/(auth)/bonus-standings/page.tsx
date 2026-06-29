@@ -52,8 +52,10 @@ export default async function BonusStandingsPage() {
     return sorted[0].week_end as string;
   })();
   const currentWeekEnd = (() => {
-    const d = new Date(lastClosedWeekEnd + 'T00:00:00');
-    d.setDate(d.getDate() + 7);
+    // Use noon UTC so +7 days lands on the correct calendar date in all timezones
+    // (midnight UTC = previous day in UTC-5 Bogota, causing off-by-one display)
+    const d = new Date(lastClosedWeekEnd + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 7);
     return d;
   })();
 
