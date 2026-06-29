@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Avatar from '@/components/ui/Avatar';
 
@@ -17,8 +17,11 @@ export default async function BonusStandingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
+  const serviceClient = createServiceClient();
+
   // Current week: sum bonus_answers where week_number IS NULL (open / not yet snapshotted)
-  const { data: openAnswers } = await supabase
+  // Uses service client to bypass RLS and return all users' rows for the leaderboard.
+  const { data: openAnswers } = await serviceClient
     .from('bonus_answers')
     .select('user_id, points_earned')
     .is('week_number', null);
@@ -31,7 +34,7 @@ export default async function BonusStandingsPage() {
   }
 
   // Get all active users
-  const { data: users } = await supabase
+  const { data: users } = await serviceClient
     .from('users')
     .select('id, display_name, avatar_url')
     .eq('is_active', true);
@@ -47,7 +50,7 @@ export default async function BonusStandingsPage() {
   });
 
   // Past weeks
-  const { data: pastWeeks } = await supabase
+  const { data: pastWeeks } = await serviceClient
     .from('bonus_weekly_standings')
     .select('week_number, week_start, week_end, user_id, bonus_points_this_week, rank, sponsor_prize, finalized')
     .eq('finalized', true)
