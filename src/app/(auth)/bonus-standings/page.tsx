@@ -9,42 +9,27 @@ export default async function BonusStandingsPage() {
 
   const serviceClient = createServiceClient();
 
-  // Current week: sum bonus_answers where week_number IS NULL (open / not yet snapshotted)
-  // Uses service client to bypass RLS and return all users' rows for the leaderboard.
-  const { data: openAnswers } = await serviceClient
-    .from('bonus_answers')
-    .select('user_id, points_earned, week_number');
+  // Aggregate current-week bonus points via RPC (SECURITY DEFINER, no row limit).
+  // Sums bonus_answers.points_earned WHERE week_number IS NULL per active user.
+  const { data: currentWeek } = await serviceClient.rpc('get_current_week_bonus');
 
-  // DEBUG — remove once points mismatch is resolved
-  console.log('[bonus-standings] total bonus_answers fetched:', openAnswers?.length ?? 0);
-  const nullWeek = (openAnswers ?? []).filter((a) => a.week_number === null);
-  console.log('[bonus-standings] rows with week_number IS NULL:', nullWeek.length);
-  console.log('[bonus-standings] first 3 rows:', JSON.stringify(nullWeek.slice(0, 3)));
-
-  const ptsByUser = new Map<string, number>();
-  for (const a of nullWeek) {
-    if (a.points_earned) {
-      ptsByUser.set(a.user_id, (ptsByUser.get(a.user_id) ?? 0) + a.points_earned);
-    }
-  }
-
-  // Get all active users
+  // Attach avatar_url (not in RPC result) and rank
   const { data: users } = await serviceClient
     .from('users')
     .select('id, display_name, avatar_url')
     .eq('is_active', true);
 
-  const currentWeekRows = (users ?? [])
-    .map((u) => ({ ...u, pts: ptsByUser.get(u.id) ?? 0 }))
-    .sort((a, b) => b.pts - a.pts);
+  const avatarMap = new Map((users ?? []).map((u) => [u.id, u.avatar_url]));
+
+  const rows = (currentWeek ?? []) as { user_id: string; display_name: string; bonus_pts: number }[];
 
   let rank = 1;
-  const ranked = currentWeekRows.map((r, i) => {
-    if (i > 0 && r.pts < currentWeekRows[i - 1].pts) rank = i + 1;
-    return { ...r, rank };
+  const ranked = rows.map((r, i) => {
+    if (i > 0 && r.bonus_pts < rows[i - 1].bonus_pts) rank = i + 1;
+    return { ...r, rank, avatar_url: avatarMap.get(r.user_id) ?? null };
   });
 
-  // Past weeks — ordered ascending so the last entry is the most recently closed week
+  // Past weeks — ordered descending by week_number, then by rank
   const { data: pastWeeks } = await serviceClient
     .from('bonus_weekly_standings')
     .select('week_number, week_start, week_end, user_id, bonus_points_this_week, rank, sponsor_prize, finalized')
@@ -60,11 +45,9 @@ export default async function BonusStandingsPage() {
   }
 
   // Derive current week end from the last closed week (same logic as admin/bonus-weeks).
-  // Falls back to the hardcoded initial week end if no week has been closed yet.
   const INITIAL_WEEK_END = '2026-06-21';
   const lastClosedWeekEnd = (() => {
     if (!pastWeeks || pastWeeks.length === 0) return INITIAL_WEEK_END;
-    // Find the highest week_number's week_end
     const sorted = [...pastWeeks].sort((a, b) => b.week_number - a.week_number);
     return sorted[0].week_end as string;
   })();
@@ -95,7 +78,7 @@ export default async function BonusStandingsPage() {
           </div>
         </div>
 
-        {ranked.every((r) => r.pts === 0) ? (
+        {ranked.every((r) => r.bonus_pts === 0) ? (
           <p className="text-center text-gray-400 py-4">
             No hay puntos bonus acumulados esta semana aún.
           </p>
@@ -103,16 +86,16 @@ export default async function BonusStandingsPage() {
           <div className="space-y-2">
             {ranked.map((row) => (
               <div
-                key={row.id}
+                key={row.user_id}
                 className={`flex items-center gap-3 py-2 px-3 rounded-xl
-                  ${row.id === user.id ? 'bg-[#e8f5e9] font-semibold' : 'hover:bg-gray-50'}`}
+                  ${row.user_id === user.id ? 'bg-[#e8f5e9] font-semibold' : 'hover:bg-gray-50'}`}
               >
                 <span className="w-8 text-center font-display text-lg text-[#0a4a2e]">
                   #{row.rank}
                 </span>
                 <Avatar displayName={row.display_name} avatarUrl={row.avatar_url} size={28} />
                 <span className="flex-1 text-sm">{row.display_name}</span>
-                <span className="font-bold text-[#0a4a2e]">{row.pts} pts</span>
+                <span className="font-bold text-[#0a4a2e]">{row.bonus_pts} pts</span>
               </div>
             ))}
           </div>
