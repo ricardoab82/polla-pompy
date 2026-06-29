@@ -2,16 +2,6 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Avatar from '@/components/ui/Avatar';
 
-function getNextSunday(): Date {
-  const d = new Date();
-  const day = d.getUTCDay(); // 0 = Sunday
-  const daysUntilSunday = day === 0 ? 7 : 7 - day;
-  const next = new Date(d);
-  next.setUTCDate(d.getUTCDate() + daysUntilSunday);
-  next.setUTCHours(23, 59, 59, 0);
-  return next;
-}
-
 export default async function BonusStandingsPage() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -23,11 +13,16 @@ export default async function BonusStandingsPage() {
   // Uses service client to bypass RLS and return all users' rows for the leaderboard.
   const { data: openAnswers } = await serviceClient
     .from('bonus_answers')
-    .select('user_id, points_earned')
-    .is('week_number', null);
+    .select('user_id, points_earned, week_number');
+
+  // DEBUG — remove once points mismatch is resolved
+  console.log('[bonus-standings] total bonus_answers fetched:', openAnswers?.length ?? 0);
+  const nullWeek = (openAnswers ?? []).filter((a) => a.week_number === null);
+  console.log('[bonus-standings] rows with week_number IS NULL:', nullWeek.length);
+  console.log('[bonus-standings] first 3 rows:', JSON.stringify(nullWeek.slice(0, 3)));
 
   const ptsByUser = new Map<string, number>();
-  for (const a of openAnswers ?? []) {
+  for (const a of nullWeek) {
     if (a.points_earned) {
       ptsByUser.set(a.user_id, (ptsByUser.get(a.user_id) ?? 0) + a.points_earned);
     }
@@ -49,7 +44,7 @@ export default async function BonusStandingsPage() {
     return { ...r, rank };
   });
 
-  // Past weeks
+  // Past weeks — ordered ascending so the last entry is the most recently closed week
   const { data: pastWeeks } = await serviceClient
     .from('bonus_weekly_standings')
     .select('week_number, week_start, week_end, user_id, bonus_points_this_week, rank, sponsor_prize, finalized')
@@ -64,8 +59,22 @@ export default async function BonusStandingsPage() {
     weekMap.get(row.week_number)!.push(row);
   }
 
+  // Derive current week end from the last closed week (same logic as admin/bonus-weeks).
+  // Falls back to the hardcoded initial week end if no week has been closed yet.
+  const INITIAL_WEEK_END = '2026-06-21';
+  const lastClosedWeekEnd = (() => {
+    if (!pastWeeks || pastWeeks.length === 0) return INITIAL_WEEK_END;
+    // Find the highest week_number's week_end
+    const sorted = [...pastWeeks].sort((a, b) => b.week_number - a.week_number);
+    return sorted[0].week_end as string;
+  })();
+  const currentWeekEnd = (() => {
+    const d = new Date(lastClosedWeekEnd + 'T00:00:00');
+    d.setDate(d.getDate() + 7);
+    return d;
+  })();
+
   const userMap = new Map((users ?? []).map((u) => [u.id, u]));
-  const nextSunday = getNextSunday();
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
@@ -78,7 +87,7 @@ export default async function BonusStandingsPage() {
           <div className="text-right">
             <p className="text-xs text-gray-400">Cierra el</p>
             <p className="text-sm font-semibold text-gray-600">
-              {nextSunday.toLocaleDateString('es-CO', {
+              {currentWeekEnd.toLocaleDateString('es-CO', {
                 timeZone: 'America/Bogota',
                 weekday: 'short', day: 'numeric', month: 'short',
               })}
