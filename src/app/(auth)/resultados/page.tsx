@@ -4,11 +4,20 @@ import ResultadosView from '@/components/resultados/ResultadosView';
 
 export const revalidate = 60;
 
+type PickData = {
+  user_id: string;
+  match_id: string;
+  home_pick: number;
+  away_pick: number;
+  points_earned: number | null;
+  is_auto_assigned: boolean;
+};
+
 // PostgREST applies its default row cap even to SECURITY DEFINER RPC calls.
 // Paginate in 1000-row batches until all picks are fetched.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getAllPicks(client: any) {
-  const all: unknown[] = [];
+async function getAllPicks(client: any): Promise<PickData[]> {
+  const all: PickData[] = [];
   const pageSize = 1000;
   let from = 0;
 
