@@ -4,6 +4,28 @@ import ResultadosView from '@/components/resultados/ResultadosView';
 
 export const revalidate = 60;
 
+// PostgREST applies its default row cap even to SECURITY DEFINER RPC calls.
+// Paginate in 1000-row batches until all picks are fetched.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getAllPicks(client: any) {
+  const all: unknown[] = [];
+  const pageSize = 1000;
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await client
+      .rpc('get_all_picks_for_resultados')
+      .range(from, from + pageSize - 1);
+
+    if (error || !data || data.length === 0) break;
+    all.push(...data);
+    if (data.length < pageSize) break;
+    from += pageSize;
+  }
+
+  return all;
+}
+
 export default async function ResultadosPage() {
   const supabase = createClient();
   const {
@@ -34,11 +56,10 @@ export default async function ResultadosPage() {
 
   // RPC (SECURITY DEFINER) bypasses RLS on the picks table and avoids the
   // PostgREST URL-length issue that occurs when filtering 90+ match UUIDs
-  // via .in('match_id', [...]). Returns all picks for finished matches.
+  // via .in('match_id', [...]). Paginated in batches of 1000 because
+  // PostgREST applies its row cap even to RPC responses.
   const serviceClient = createServiceClient();
-  const { data: picks } = await serviceClient
-    .rpc('get_all_picks_for_resultados')
-    .range(0, 4999);
+  const picks = await getAllPicks(serviceClient);
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-6">
