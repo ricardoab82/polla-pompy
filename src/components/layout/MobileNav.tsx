@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/special-picks',   label: 'Picks Esp.', icon: '🌟' },
   { href: '/bracket',         label: 'Llaves',     icon: '🏆' },
   { href: '/standings',       label: 'Posiciones', icon: '📊' },
+  { href: '/resultados',      label: 'Result.',    icon: '📋' },
   { href: '/bonus-standings', label: 'Bonus',      icon: '🎯' },
   { href: '/profile',         label: 'Perfil',     icon: '👤' },
 ];

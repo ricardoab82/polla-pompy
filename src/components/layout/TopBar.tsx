@@ -41,6 +41,7 @@ export default async function TopBar() {
           <Link href="/special-picks"   className="hover:text-[#0a4a2e] transition-colors">Picks Esp.</Link>
           <Link href="/bracket"         className="hover:text-[#0a4a2e] transition-colors">Llaves</Link>
           <Link href="/standings"       className="hover:text-[#0a4a2e] transition-colors">Posiciones</Link>
+          <Link href="/resultados"      className="hover:text-[#0a4a2e] transition-colors">Resultados</Link>
           <Link href="/bonus-standings" className="hover:text-[#0a4a2e] transition-colors">Bonus</Link>
           {profile?.role !== 'participant' && (
             <Link href="/admin" className="hover:text-[#0a4a2e] transition-colors text-amber-600">
