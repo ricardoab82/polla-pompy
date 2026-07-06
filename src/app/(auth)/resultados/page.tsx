@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ResultadosView from '@/components/resultados/ResultadosView';
 
@@ -32,9 +32,12 @@ export default async function ResultadosPage() {
   const users      = usersRes.data      ?? [];
   const leaderboard = leaderboardRes.data ?? [];
 
+  // Use service client to bypass RLS — picks table restricts reads to own rows,
+  // but this page intentionally shows all participants' picks for transparency.
+  const serviceClient = createServiceClient();
   const matchIds = matches.map((m) => m.id);
   const { data: picks } = matchIds.length
-    ? await supabase
+    ? await serviceClient
         .from('picks')
         .select('user_id, match_id, home_pick, away_pick, points_earned')
         .in('match_id', matchIds)
