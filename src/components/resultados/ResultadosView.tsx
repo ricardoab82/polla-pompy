@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, Fragment } from 'react';
+import { calculatePoints, type Phase } from '@/lib/scoring';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Match {
@@ -75,6 +76,20 @@ function getOutcome(match: Match, pick: PickData | undefined): Outcome {
     pick.home_pick > pick.away_pick ? 'home' :
     pick.away_pick > pick.home_pick ? 'away' : 'draw';
   return resWinner === pickWinner ? 'correct_winner' : 'wrong';
+}
+
+// Returns stored points_earned if present, otherwise calculates on the fly
+// from the pick vs actual score. Handles the case where points_earned is NULL
+// because the points engine hasn't run yet for that match.
+function getEffectivePoints(match: Match, pick: PickData | undefined): number | null {
+  if (!pick) return null;
+  if (pick.points_earned !== null) return pick.points_earned;
+  if (match.home_score === null || match.away_score === null) return null;
+  return calculatePoints(
+    { homeScore: match.home_score, awayScore: match.away_score },
+    { homePick: pick.home_pick,   awayPick: pick.away_pick },
+    match.phase as Phase,
+  );
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -277,6 +292,7 @@ function ComparisonTable({
                   {users.map((u) => {
                     const pick = picksByUser.get(u.id)?.get(match.id);
                     const outcome = getOutcome(match, pick);
+                    const pts = getEffectivePoints(match, pick);
                     const isCurrent = u.id === currentUserId;
 
                     const cellBg =
@@ -299,9 +315,9 @@ function ComparisonTable({
                             <span className={`font-mono font-medium ${textColor}`}>
                               {pick.home_pick}–{pick.away_pick}
                             </span>
-                            {pick.points_earned !== null && (
+                            {pts !== null && (
                               <span className={`text-[10px] font-semibold ${textColor}`}>
-                                {pick.points_earned > 0 ? `+${pick.points_earned}` : '0'}
+                                {pts > 0 ? `+${pts}` : '0'}
                               </span>
                             )}
                           </div>
@@ -326,7 +342,7 @@ function ComparisonTable({
             <td className="border-r border-gray-200" />
             {users.map((u) => {
               const total = matches.reduce(
-                (sum, m) => sum + (picksByUser.get(u.id)?.get(m.id)?.points_earned ?? 0),
+                (sum, m) => sum + (getEffectivePoints(m, picksByUser.get(u.id)?.get(m.id)) ?? 0),
                 0,
               );
               return (
@@ -409,7 +425,7 @@ function UserBreakdown({
         if (!phaseMatches?.length) return null;
 
         const phaseTotal = phaseMatches.reduce(
-          (sum, m) => sum + (userPicks.get(m.id)?.points_earned ?? 0),
+          (sum, m) => sum + (getEffectivePoints(m, userPicks.get(m.id)) ?? 0),
           0,
         );
 
@@ -487,13 +503,16 @@ function UserBreakdown({
                         </td>
 
                         <td className="px-4 py-2.5 text-right font-semibold">
-                          {pick?.points_earned != null ? (
-                            <span className={ptsColor}>
-                              {pick.points_earned > 0 ? `+${pick.points_earned}` : '0'}
-                            </span>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
+                          {(() => {
+                            const pts = getEffectivePoints(m, pick);
+                            return pts !== null ? (
+                              <span className={ptsColor}>
+                                {pts > 0 ? `+${pts}` : '0'}
+                              </span>
+                            ) : (
+                              <span className="text-gray-300">—</span>
+                            );
+                          })()}
                         </td>
                       </tr>
                     );
