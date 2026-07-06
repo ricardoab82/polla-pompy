@@ -2,7 +2,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ResultadosView from '@/components/resultados/ResultadosView';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic'; // disable cache during debug
 
 export default async function ResultadosPage() {
   const supabase = createClient();
@@ -43,10 +43,26 @@ export default async function ResultadosPage() {
   //
   // With ~25 users × ~150 matches ≈ 4000 total picks in the DB, 10000 is a safe ceiling.
   const serviceClient = createServiceClient();
-  const { data: picks } = await serviceClient
+  const { data: allPicks } = await serviceClient
     .from('picks')
     .select('user_id, match_id, home_pick, away_pick, points_earned')
     .limit(10000);
+
+  const picks = allPicks ?? [];
+
+  // ── Debug logging (remove after diagnosis) ──────────────────────────────────
+  const bigPollaId = users.find((u) => u.display_name === 'Big Polla')?.id;
+  console.log('[resultados] total picks fetched:', picks.length);
+  console.log('[resultados] unique users in picks:', new Set(picks.map((p) => p.user_id)).size);
+  console.log('[resultados] finished matches fetched:', matches.length);
+  console.log('[resultados] Big Polla user_id:', bigPollaId);
+  console.log('[resultados] Big Polla picks count:', picks.filter((p) => p.user_id === bigPollaId).length);
+  console.log('[resultados] Big Polla group picks:', picks.filter((p) => {
+    if (p.user_id !== bigPollaId) return false;
+    const m = matches.find((m) => m.id === p.match_id);
+    return m?.phase === 'group';
+  }).length);
+  // ── End debug ────────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-6">
