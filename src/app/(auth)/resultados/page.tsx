@@ -2,7 +2,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ResultadosView from '@/components/resultados/ResultadosView';
 
-export const dynamic = 'force-dynamic'; // disable cache during debug
+export const revalidate = 60;
 
 export default async function ResultadosPage() {
   const supabase = createClient();
@@ -32,37 +32,11 @@ export default async function ResultadosPage() {
   const users       = usersRes.data       ?? [];
   const leaderboard = leaderboardRes.data ?? [];
 
-  // Use service client to bypass RLS — picks table restricts reads to own rows,
-  // but this page intentionally shows all participants' picks for transparency.
-  //
-  // Do NOT filter by .in('match_id', matchIds): passing 90+ UUIDs in a PostgREST
-  // IN clause generates a URL that gets silently truncated by the Supabase proxy,
-  // causing only the first ~5 match IDs to be filtered and most picks to be missing.
-  // Instead fetch ALL picks and let the client-side picksByUser map handle implicit
-  // filtering (cells only look up picks for the finished matches in the matches array).
-  //
-  // With ~25 users × ~150 matches ≈ 4000 total picks in the DB, 10000 is a safe ceiling.
+  // RPC (SECURITY DEFINER) bypasses RLS on the picks table and avoids the
+  // PostgREST URL-length issue that occurs when filtering 90+ match UUIDs
+  // via .in('match_id', [...]). Returns all picks for finished matches.
   const serviceClient = createServiceClient();
-  const { data: allPicks } = await serviceClient
-    .from('picks')
-    .select('user_id, match_id, home_pick, away_pick, points_earned')
-    .limit(10000);
-
-  const picks = allPicks ?? [];
-
-  // ── Debug logging (remove after diagnosis) ──────────────────────────────────
-  const bigPollaId = users.find((u) => u.display_name === 'Big Polla')?.id;
-  console.log('[resultados] total picks fetched:', picks.length);
-  console.log('[resultados] unique users in picks:', new Set(picks.map((p) => p.user_id)).size);
-  console.log('[resultados] finished matches fetched:', matches.length);
-  console.log('[resultados] Big Polla user_id:', bigPollaId);
-  console.log('[resultados] Big Polla picks count:', picks.filter((p) => p.user_id === bigPollaId).length);
-  console.log('[resultados] Big Polla group picks:', picks.filter((p) => {
-    if (p.user_id !== bigPollaId) return false;
-    const m = matches.find((m) => m.id === p.match_id);
-    return m?.phase === 'group';
-  }).length);
-  // ── End debug ────────────────────────────────────────────────────────────────
+  const { data: picks } = await serviceClient.rpc('get_all_picks_for_resultados');
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-6">
