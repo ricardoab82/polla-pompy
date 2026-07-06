@@ -28,23 +28,25 @@ export default async function ResultadosPage() {
       .order('total_points', { ascending: false }),
   ]);
 
-  const matches    = matchesRes.data    ?? [];
-  const users      = usersRes.data      ?? [];
+  const matches     = matchesRes.data     ?? [];
+  const users       = usersRes.data       ?? [];
   const leaderboard = leaderboardRes.data ?? [];
 
   // Use service client to bypass RLS — picks table restricts reads to own rows,
   // but this page intentionally shows all participants' picks for transparency.
-  // .limit(5000) overrides the default 1000-row cap; with ~25 users × 92 finished
-  // matches the total is ~2300 picks, so 5000 is a safe ceiling.
+  //
+  // Do NOT filter by .in('match_id', matchIds): passing 90+ UUIDs in a PostgREST
+  // IN clause generates a URL that gets silently truncated by the Supabase proxy,
+  // causing only the first ~5 match IDs to be filtered and most picks to be missing.
+  // Instead fetch ALL picks and let the client-side picksByUser map handle implicit
+  // filtering (cells only look up picks for the finished matches in the matches array).
+  //
+  // With ~25 users × ~150 matches ≈ 4000 total picks in the DB, 10000 is a safe ceiling.
   const serviceClient = createServiceClient();
-  const matchIds = matches.map((m) => m.id);
-  const { data: picks } = matchIds.length
-    ? await serviceClient
-        .from('picks')
-        .select('user_id, match_id, home_pick, away_pick, points_earned')
-        .in('match_id', matchIds)
-        .limit(5000)
-    : { data: [] };
+  const { data: picks } = await serviceClient
+    .from('picks')
+    .select('user_id, match_id, home_pick, away_pick, points_earned')
+    .limit(10000);
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-6">
