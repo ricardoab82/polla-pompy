@@ -36,7 +36,9 @@ export default async function ResultadosPage() {
   // PostgREST URL-length issue that occurs when filtering 90+ match UUIDs
   // via .in('match_id', [...]). Returns all picks for finished matches.
   const serviceClient = createServiceClient();
-  const { data: picks } = await serviceClient.rpc('get_all_picks_for_resultados');
+  const { data: picks } = await serviceClient
+    .rpc('get_all_picks_for_resultados')
+    .range(0, 4999);
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-6">
