@@ -34,6 +34,8 @@ export default async function ResultadosPage() {
 
   // Use service client to bypass RLS — picks table restricts reads to own rows,
   // but this page intentionally shows all participants' picks for transparency.
+  // .limit(5000) overrides the default 1000-row cap; with ~25 users × 92 finished
+  // matches the total is ~2300 picks, so 5000 is a safe ceiling.
   const serviceClient = createServiceClient();
   const matchIds = matches.map((m) => m.id);
   const { data: picks } = matchIds.length
@@ -41,6 +43,7 @@ export default async function ResultadosPage() {
         .from('picks')
         .select('user_id, match_id, home_pick, away_pick, points_earned')
         .in('match_id', matchIds)
+        .limit(5000)
     : { data: [] };
 
   return (
