@@ -6,7 +6,7 @@ import Avatar from '@/components/ui/Avatar';
 const PHASE_LABELS: Record<string, string> = {
   group: 'Fase de grupos', round_of_32: 'Ronda de 32',
   round_of_16: 'Octavos', quarterfinal: 'Cuartos',
-  semifinal: 'Semifinal', final: 'Final',
+  semifinal: 'Semifinal', third_place: 'Tercer puesto', final: 'Final',
 };
 
 function formatKickoff(utc: string): string {

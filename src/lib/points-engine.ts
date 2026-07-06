@@ -7,7 +7,7 @@ import { calculatePoints } from '@/lib/scoring';
 import type { Phase } from '@/lib/scoring';
 import { sendPointsUpdatedEmail } from '@/lib/notifications';
 
-const KNOCKOUT_PHASES = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'final'] as const;
+const KNOCKOUT_PHASES = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final'] as const;
 
 // Advance the winner of a finished knockout match into the next match slot.
 // Called automatically when scores are decisive; can also be called manually by admin.

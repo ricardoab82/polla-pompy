@@ -15,6 +15,7 @@ export type MatchPhase   =
   | 'round_of_16'
   | 'quarterfinal'
   | 'semifinal'
+  | 'third_place'
   | 'final';
 
 // ── Row types (what comes back from SELECT) ────────────────

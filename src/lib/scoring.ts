@@ -7,6 +7,7 @@ export type Phase =
   | 'round_of_16'
   | 'quarterfinal'
   | 'semifinal'
+  | 'third_place'
   | 'final';
 
 export interface MatchResult {
@@ -21,12 +22,13 @@ export interface Pick {
 
 // Points table per phase: [exact, correct_winner]
 const PHASE_POINTS: Record<Phase, [number, number]> = {
-  group:       [3, 1],
-  round_of_32: [4, 2],
-  round_of_16: [5, 2],
-  quarterfinal:[7, 3],
-  semifinal:   [10, 4],
-  final:       [15, 6],
+  group:        [3,  1],
+  round_of_32:  [4,  2],
+  round_of_16:  [5,  2],
+  quarterfinal: [7,  3],
+  semifinal:    [10, 4],
+  third_place:  [10, 4],
+  final:        [15, 6],
 };
 
 export type PickOutcome = 'exact' | 'correct_winner' | 'wrong';

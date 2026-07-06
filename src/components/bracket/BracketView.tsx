@@ -18,11 +18,12 @@ interface BracketViewProps {
 }
 
 const ROUNDS = [
-  { phase: 'round_of_32' as const,  label: 'Ronda de 32', short: 'R32' },
-  { phase: 'round_of_16' as const,  label: 'Octavos',     short: 'R16' },
-  { phase: 'quarterfinal' as const, label: 'Cuartos',     short: 'CUA' },
-  { phase: 'semifinal' as const,    label: 'Semifinal',   short: 'SF'  },
-  { phase: 'final' as const,        label: 'Final',       short: 'FIN' },
+  { phase: 'round_of_32' as const,  label: 'Ronda de 32',    short: 'R32' },
+  { phase: 'round_of_16' as const,  label: 'Octavos',        short: 'R16' },
+  { phase: 'quarterfinal' as const, label: 'Cuartos',        short: 'CUA' },
+  { phase: 'semifinal' as const,    label: 'Semifinal',      short: 'SF'  },
+  { phase: 'third_place' as const,  label: 'Tercer puesto',  short: '3°'  },
+  { phase: 'final' as const,        label: 'Final',          short: 'FIN' },
 ];
 
 type SaveStatus = 'saving' | 'saved' | 'error';

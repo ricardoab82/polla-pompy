@@ -4,7 +4,7 @@ import BracketView from '@/components/bracket/BracketView';
 
 export const revalidate = 60;
 
-const KNOCKOUT_PHASES = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'final'];
+const KNOCKOUT_PHASES = ['round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final'];
 
 export default async function BracketPage() {
   const supabase = createClient();

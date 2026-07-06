@@ -46,11 +46,11 @@ type PhaseLabel = {
   [key: string]: string;
 };
 
-const PHASE_ORDER = ['group', 'round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'final'];
+const PHASE_ORDER = ['group', 'round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final'];
 const PHASE_LABELS: PhaseLabel = {
   group: 'Fase de grupos', round_of_32: 'Ronda de 32',
   round_of_16: 'Octavos de final', quarterfinal: 'Cuartos de final',
-  semifinal: 'Semifinal', final: 'Gran Final',
+  semifinal: 'Semifinal', third_place: 'Tercer puesto', final: 'Gran Final',
 };
 
 function formatKickoff(utc: string) {
