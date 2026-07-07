@@ -133,46 +133,8 @@ export default function ResultadosView({ matches, picks, users, leaderboard, cur
 
   const selectedUser = users.find((u) => u.id === selectedTab);
 
-  // DEBUG: pick-count per user derived from the raw picks array
-  const debugCounts = useMemo(
-    () =>
-      users.map((u) => ({
-        name: u.display_name,
-        id: u.id,
-        fromArray: picks.filter((p) => p.user_id === u.id).length,
-        fromMap: picksByUser.get(u.id)?.size ?? 0,
-      })),
-    [users, picks, picksByUser],
-  );
-
   return (
     <div>
-      {/* ── DEBUG panel (remove once bug is resolved) ── */}
-      <details className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs font-mono">
-        <summary className="cursor-pointer font-semibold text-yellow-800">
-          DEBUG — total picks received: {picks.length} | users: {users.length} | map entries: {picksByUser.size}
-        </summary>
-        <table className="mt-2 w-full border-collapse">
-          <thead><tr className="text-left"><th className="pr-4">User</th><th className="pr-4">ID (first 8)</th><th className="pr-4">filter()</th><th>Map</th></tr></thead>
-          <tbody>
-            {debugCounts.map((d) => (
-              <tr key={d.id} className={d.fromArray !== d.fromMap ? 'bg-red-100' : ''}>
-                <td className="pr-4">{d.name}</td>
-                <td className="pr-4">{d.id.slice(0, 8)}</td>
-                <td className="pr-4">{d.fromArray}</td>
-                <td>{d.fromMap}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="mt-2 text-yellow-700">
-          Sample pick user_ids: {picks.slice(0,3).map(p=>p.user_id.slice(0,8)).join(', ')}
-        </div>
-        <div className="mt-1 text-yellow-700">
-          Sample user ids: {users.slice(0,3).map(u=>u.id.slice(0,8)).join(', ')}
-        </div>
-      </details>
-
       {/* ── Tab bar ── */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-6 border-b border-gray-200">
         <TabBtn

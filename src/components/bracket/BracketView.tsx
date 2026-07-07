@@ -29,7 +29,8 @@ const ROUNDS = [
 type SaveStatus = 'saving' | 'saved' | 'error';
 
 function formatDate(kickoff: string): string {
-  return new Date(kickoff).toLocaleDateString('es-CO', {
+  return new Date(kickoff).toLocaleString('es-CO', {
+    timeZone: 'America/Bogota',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
