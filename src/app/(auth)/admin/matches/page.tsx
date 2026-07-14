@@ -23,9 +23,10 @@ export default async function AdminMatchesPage() {
   const { data: matches } = await supabase
     .from('matches')
     .select('*')
+    .in('phase', ['group', 'round_of_32', 'round_of_16', 'quarterfinal', 'semifinal', 'third_place', 'final'])
     .not('status', 'eq', 'cancelled')
     .order('kickoff_utc')
-    .limit(100);
+    .limit(500);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
